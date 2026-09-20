@@ -1,0 +1,11 @@
+capabilities:
+  - phishing
+  - ip-grabber
+  - bomber
+  - bruteforce
+  - private-account-bypass
+  - dox-dump
+  - active-scanner
+topics: []
+keywords: []
+repos: []
