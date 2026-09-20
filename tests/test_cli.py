@@ -41,6 +41,12 @@ def test_help_no_osint():
     assert "osint" not in result.output.lower()
 
 
+def test_keys_help():
+    result = runner.invoke(app, ["keys", "--help"])
+    assert result.exit_code == 0
+    assert "Manage API keys." in result.output
+
+
 @pytest.mark.parametrize(
     "cmd_args",
     [

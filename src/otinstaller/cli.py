@@ -116,7 +116,7 @@ def init():
     raise typer.Exit(code=2)
 
 
-keys_app = typer.Typer(no_args_is_help=True)
+keys_app = typer.Typer(no_args_is_help=True, help="Manage API keys.")
 app.add_typer(keys_app, name="keys")
 
 
