@@ -1,0 +1,36 @@
+# Sample entries. The registry pipeline will replace these with verified entries.
+tools:
+  - name: sherlock
+    display_name: "Sherlock"
+    description: "Search for a username across many social networks"
+    install:
+      method: pip
+      package: sherlock-project
+    entrypoint:
+      command: sherlock
+    smoke_args: ["--help"]
+    capabilities: ["username-search"]
+
+  - name: maigret
+    display_name: "Maigret"
+    description: "Build a profile from a username across many sites"
+    install:
+      method: pip
+      package: maigret
+    entrypoint:
+      command: maigret
+    capabilities: ["username-search"]
+
+  - name: theharvester
+    display_name: "theHarvester"
+    description: "Find emails, subdomains and names for a domain"
+    repo: "laramies/theHarvester"
+    install:
+      method: git
+      url: https://github.com/laramies/theHarvester.git
+      as_package: true
+    entrypoint:
+      command: theHarvester
+    capabilities: ["domain-recon", "email-search"]
+    api_keys:
+      optional: ["SHODAN_API_KEY", "HUNTER_API_KEY"]
