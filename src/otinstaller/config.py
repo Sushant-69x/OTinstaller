@@ -4,6 +4,46 @@ import os
 from pathlib import Path
 
 
+def get_distro() -> str:
+    """Return the distro ID from /etc/os-release (lowercased), or 'unknown'."""
+    path = Path("/etc/os-release")
+    if not path.exists():
+        return "unknown"
+    try:
+        content = path.read_text()
+        for line in content.splitlines():
+            if line.startswith("ID="):
+                value = line.split("=", 1)[1].strip().strip('"')
+                return value.lower()
+    except Exception:
+        pass
+    return "unknown"
+
+
+def get_distro_family() -> str:
+    """Return the distro family: 'debian', 'arch', or 'unknown'."""
+    distro = get_distro()
+    if distro in ("ubuntu", "debian", "kali", "linuxmint", "pop", "elementary", "zorin"):
+        return "debian"
+    if distro in ("arch", "manjaro", "endeavouros", "garuda", "artix"):
+        return "arch"
+    # Check ID_LIKE for derivatives
+    path = Path("/etc/os-release")
+    if path.exists():
+        try:
+            content = path.read_text()
+            for line in content.splitlines():
+                if line.startswith("ID_LIKE="):
+                    value = line.split("=", 1)[1].strip().strip('"').lower()
+                    if "debian" in value or "ubuntu" in value:
+                        return "debian"
+                    if "arch" in value:
+                        return "arch"
+        except Exception:
+            pass
+    return "unknown"
+
+
 def get_home() -> Path:
     """Return the otinstaller home directory."""
     env_home = os.environ.get("OTINSTALLER_HOME")

@@ -5,6 +5,8 @@ from pathlib import Path
 from otinstaller.config import (
     ensure_dir,
     get_accept_path,
+    get_distro,
+    get_distro_family,
     get_env_file,
     get_home,
     get_logs_dir,
@@ -85,3 +87,76 @@ def test_get_accept_path(monkeypatch, tmp_path):
 def test_tool_dir(monkeypatch, tmp_path):
     monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
     assert tool_dir("sherlock") == tmp_path / "tools" / "sherlock"
+
+
+def test_get_distro_ubuntu(monkeypatch, tmp_path):
+    os_release = tmp_path / "os-release"
+    os_release.write_text('ID="ubuntu"\nVERSION_ID="24.04"\n')
+    monkeypatch.setattr("otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x))
+    assert get_distro() == "ubuntu"
+
+
+def test_get_distro_debian(monkeypatch, tmp_path):
+    os_release = tmp_path / "os-release"
+    os_release.write_text('ID="debian"\nVERSION_ID="12"\n')
+    monkeypatch.setattr("otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x))
+    assert get_distro() == "debian"
+
+
+def test_get_distro_arch(monkeypatch, tmp_path):
+    os_release = tmp_path / "os-release"
+    os_release.write_text('ID="arch"\n')
+    monkeypatch.setattr("otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x))
+    assert get_distro() == "arch"
+
+
+def test_get_distro_kali(monkeypatch, tmp_path):
+    os_release = tmp_path / "os-release"
+    os_release.write_text('ID="kali"\nID_LIKE="debian"\n')
+    monkeypatch.setattr("otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x))
+    assert get_distro() == "kali"
+
+
+def test_get_distro_missing_file(monkeypatch, tmp_path):
+    monkeypatch.setattr("otinstaller.config.Path", lambda x: tmp_path / "nonexistent" if x == "/etc/os-release" else Path(x))
+    assert get_distro() == "unknown"
+
+
+def test_get_distro_family_debian(monkeypatch, tmp_path):
+    os_release = tmp_path / "os-release"
+    os_release.write_text('ID="ubuntu"\n')
+    monkeypatch.setattr("otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x))
+    assert get_distro_family() == "debian"
+
+
+def test_get_distro_family_debian_from_id_like(monkeypatch, tmp_path):
+    os_release = tmp_path / "os-release"
+    os_release.write_text('ID="linuxmint"\nID_LIKE="ubuntu debian"\n')
+    monkeypatch.setattr("otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x))
+    assert get_distro_family() == "debian"
+
+
+def test_get_distro_family_arch(monkeypatch, tmp_path):
+    os_release = tmp_path / "os-release"
+    os_release.write_text('ID="manjaro"\n')
+    monkeypatch.setattr("otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x))
+    assert get_distro_family() == "arch"
+
+
+def test_get_distro_family_arch_from_id_like(monkeypatch, tmp_path):
+    os_release = tmp_path / "os-release"
+    os_release.write_text('ID="endeavouros"\nID_LIKE="arch"\n')
+    monkeypatch.setattr("otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x))
+    assert get_distro_family() == "arch"
+
+
+def test_get_distro_family_unknown(monkeypatch, tmp_path):
+    os_release = tmp_path / "os-release"
+    os_release.write_text('ID="fedora"\n')
+    monkeypatch.setattr("otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x))
+    assert get_distro_family() == "unknown"
+
+
+def test_get_distro_family_missing_file(monkeypatch, tmp_path):
+    monkeypatch.setattr("otinstaller.config.Path", lambda x: tmp_path / "nonexistent" if x == "/etc/os-release" else Path(x))
+    assert get_distro_family() == "unknown"
