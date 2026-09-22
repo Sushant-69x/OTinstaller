@@ -2,7 +2,17 @@
 
 from pathlib import Path
 
-from otinstaller.config import ensure_dir, get_env_file, get_home, get_results_dir
+from otinstaller.config import (
+    ensure_dir,
+    get_accept_path,
+    get_env_file,
+    get_home,
+    get_logs_dir,
+    get_results_dir,
+    get_state_path,
+    get_tools_dir,
+    tool_dir,
+)
 
 
 def test_get_home_default(monkeypatch):
@@ -50,3 +60,28 @@ def test_ensure_dir_idempotent(tmp_path):
     result = ensure_dir(dir_path)
     assert result == dir_path
     assert dir_path.exists()
+
+
+def test_get_tools_dir(monkeypatch, tmp_path):
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    assert get_tools_dir() == tmp_path / "tools"
+
+
+def test_get_logs_dir(monkeypatch, tmp_path):
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    assert get_logs_dir() == tmp_path / "logs"
+
+
+def test_get_state_path(monkeypatch, tmp_path):
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    assert get_state_path() == tmp_path / "state.db"
+
+
+def test_get_accept_path(monkeypatch, tmp_path):
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    assert get_accept_path() == tmp_path / "accepted.json"
+
+
+def test_tool_dir(monkeypatch, tmp_path):
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    assert tool_dir("sherlock") == tmp_path / "tools" / "sherlock"
