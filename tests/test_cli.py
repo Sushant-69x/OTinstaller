@@ -1,5 +1,7 @@
 """CLI tests."""
 
+import sys
+
 import pytest
 from typer.testing import CliRunner
 
@@ -50,11 +52,8 @@ def test_keys_help():
 @pytest.mark.parametrize(
     "cmd_args",
     [
-        ["install", "tool1"],
-        ["remove", "tool1"],
         ["update", "tool1"],
         ["example", "tool1"],
-        ["init"],
         ["keys", "check"],
         ["resume"],
         ["doctor"],
@@ -101,7 +100,7 @@ def test_list_table(monkeypatch, tmp_path):
     assert result.exit_code == 0
     assert "sherlock" in result.output
     assert "username-search" not in result.output
-    assert "1 tools" in result.output
+    assert "1 tool" in result.output
 
 
 def test_list_json(monkeypatch, tmp_path):
@@ -152,13 +151,28 @@ def test_list_empty_json(monkeypatch, tmp_path):
     assert data == []
 
 
-def test_list_installed_not_implemented(monkeypatch, tmp_path):
+def test_list_installed(monkeypatch, tmp_path):
+    # Use a temp OTINSTALLER_HOME for state DB
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
     reg = make_registry_yaml(tmp_path, [])
     monkeypatch.setenv("OTINSTALLER_REGISTRY", str(reg))
 
     result = runner.invoke(app, ["list", "--installed"])
-    assert result.exit_code == 2
-    assert "not implemented yet" in result.output
+    assert result.exit_code == 0
+    assert "no tools installed" in result.output
+
+
+def test_list_installed_json(monkeypatch, tmp_path):
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    reg = make_registry_yaml(tmp_path, [])
+    monkeypatch.setenv("OTINSTALLER_REGISTRY", str(reg))
+
+    result = runner.invoke(app, ["list", "--installed", "--json"])
+    assert result.exit_code == 0
+    import json
+
+    data = json.loads(result.output)
+    assert data == []
 
 
 def test_search(monkeypatch, tmp_path):
@@ -215,6 +229,41 @@ def test_search_no_match(monkeypatch, tmp_path):
     result = runner.invoke(app, ["search", "email"])
     assert result.exit_code == 0
     assert "no tools match 'email'" in result.output
+
+
+def test_search_single_match(monkeypatch, tmp_path):
+    tools = [
+        {
+            "name": "sherlock",
+            "display_name": "Sherlock",
+            "description": "Search usernames",
+            "install": {
+                "method": "pip",
+                "package": "sherlock-project",
+            },
+            "entrypoint": {"command": "sherlock"},
+            "capabilities": ["username-search"],
+        },
+        {
+            "name": "maigret",
+            "display_name": "Maigret",
+            "description": "Build profile",
+            "install": {
+                "method": "pip",
+                "package": "maigret",
+            },
+            "entrypoint": {"command": "maigret"},
+            "capabilities": ["username-search"],
+        },
+    ]
+    reg = make_registry_yaml(tmp_path, tools)
+    monkeypatch.setenv("OTINSTALLER_REGISTRY", str(reg))
+
+    result = runner.invoke(app, ["search", "maigret"])
+    assert result.exit_code == 0
+    assert "maigret" in result.output
+    assert "sherlock" not in result.output
+    assert "1 tool" in result.output
 
 
 def test_search_json(monkeypatch, tmp_path):
@@ -375,6 +424,20 @@ def test_broken_registry_error(monkeypatch, tmp_path):
     result = runner.invoke(app, ["list"])
     assert result.exit_code == 1
     assert "error:" in result.output
+
+
+def test_install_refuses_on_non_linux(monkeypatch):
+    monkeypatch.setattr(sys, "platform", "win32")
+    result = runner.invoke(app, ["install", "sherlock"])
+    assert result.exit_code == 1
+    assert "error: otinstaller currently supports Linux only" in result.output
+
+
+def test_remove_refuses_on_non_linux(monkeypatch):
+    monkeypatch.setattr(sys, "platform", "darwin")
+    result = runner.invoke(app, ["remove", "sherlock"])
+    assert result.exit_code == 1
+    assert "error: otinstaller currently supports Linux only" in result.output
 
 
 def test_help_no_osint_still():
