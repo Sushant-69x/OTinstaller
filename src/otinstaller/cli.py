@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import sys
 from typing import Annotated
 
 import typer
@@ -10,6 +12,25 @@ from rich.console import Console
 from rich.table import Table
 
 from otinstaller import __version__
+from otinstaller.config import (
+    ensure_dir,
+    get_env_file,
+    get_home,
+    get_logs_dir,
+    get_tools_dir,
+)
+from otinstaller.installer import (
+    AlreadyInstalled,
+    InstallError,
+    install_tool,
+    remove_tool,
+)
+from otinstaller.notice import (
+    NOTICE_SHORT,
+    NOTICE_TEXT,
+    has_accepted,
+    record_acceptance,
+)
 from otinstaller.registry import (
     RegistryError,
     default_registry_path,
@@ -18,6 +39,7 @@ from otinstaller.registry import (
     search_tools,
     suggest_names,
 )
+from otinstaller.state import list_installed
 
 app = typer.Typer(
     add_completion=False,
@@ -87,7 +109,8 @@ def _print_table(console: Console, tools: list, json_output: bool) -> None:
     for tool in tools:
         table.add_row(tool.name, tool.tier, tool.description)
     console.print(table)
-    typer.echo(f"{len(tools)} tools")
+    count = len(tools)
+    typer.echo(f"{count} tool{'s' if count != 1 else ''}")
 
 
 @app.command(name="list")
@@ -102,8 +125,35 @@ def list_tools(
 ):
     """List available tools."""
     if installed:
-        typer.echo("not implemented yet")
-        raise typer.Exit(code=2)
+        tools = list_installed()
+        console = _make_console(no_color)
+
+        if json_output:
+            from dataclasses import asdict
+
+            data = [asdict(t) for t in tools]
+            typer.echo(json.dumps(data, default=str))
+            return
+
+        if not tools:
+            typer.echo("no tools installed")
+            return
+
+        table = Table(show_header=True, header_style="bold")
+        table.add_column("Name")
+        table.add_column("Version")
+        table.add_column("Method")
+        table.add_column("Installed")
+        for tool in tools:
+            # Only show date part of installed_at
+            installed_date = (
+                tool.installed_at.split("T")[0] if "T" in tool.installed_at else tool.installed_at
+            )
+            table.add_row(tool.name, tool.version, tool.method, installed_date)
+        console.print(table)
+        count = len(tools)
+        typer.echo(f"{count} tool{'s' if count != 1 else ''}")
+        return
 
     tools = _load_registry(verbose)
     console = _make_console(no_color)
@@ -149,7 +199,8 @@ def search(
     for tool in results:
         table.add_row(tool.name, tool.tier, tool.description)
     console.print(table)
-    typer.echo(f"{len(results)} tools")
+    count = len(results)
+    typer.echo(f"{count} tool{'s' if count != 1 else ''}")
 
 
 @app.command()
@@ -236,22 +287,163 @@ def info(
 
 
 @app.command()
-def install(names: Annotated[list[str], typer.Argument(help="Tool names to install")]):
+def install(
+    names: Annotated[list[str], typer.Argument(help="Tool names to install")],
+    force: Annotated[bool, typer.Option("--force", help="Reinstall if already installed")] = False,
+    yes: Annotated[bool, typer.Option("--yes", "-y", help="Skip confirmation prompt")] = False,
+    verbose: Annotated[bool, typer.Option("--verbose", help="Verbose output")] = False,
+    no_color: Annotated[bool, typer.Option("--no-color", help="Disable colored output")] = False,
+):
     """Install tools by name."""
-    typer.echo("not implemented yet")
-    raise typer.Exit(code=2)
+    if sys.platform != "linux":
+        typer.echo("error: otinstaller currently supports Linux only", err=True)
+        raise typer.Exit(code=1)
+    if not has_accepted():
+        typer.echo("error: run 'otinstaller init' first", err=True)
+        raise typer.Exit(code=1)
+
+    tools_registry = _load_registry(verbose)
+
+    # Resolve all names
+    tools = []
+    errors = []
+    for name in names:
+        tool = find_tool(tools_registry, name)
+        if not tool:
+            suggestions = suggest_names(tools_registry, name)
+            msg = f"error: unknown tool '{name}'"
+            if suggestions:
+                msg += f"\ndid you mean: {', '.join(suggestions)}?"
+            errors.append(msg)
+        else:
+            tools.append(tool)
+
+    if errors:
+        for err in errors:
+            typer.echo(err, err=True)
+        raise typer.Exit(code=1)
+
+    # Print what will be installed
+    has_dual_use = False
+    for tool in tools:
+        if tool.install.method == "pip":
+            spec = tool.install.package or ""
+            if tool.install.version:
+                spec += f"=={tool.install.version}"
+            typer.echo(f"{tool.name} (pip: {spec})")
+        else:
+            typer.echo(f"{tool.name} (git: {tool.install.url})")
+        if "dual-use" in tool.capabilities:
+            has_dual_use = True
+
+    if has_dual_use:
+        typer.echo(NOTICE_SHORT)
+
+    # Confirmation
+    if not yes:
+        if not sys.stdin.isatty():
+            typer.echo("error: confirmation needed, run with --yes", err=True)
+            raise typer.Exit(code=1)
+        answer = typer.prompt("Install? [y/N]", default="n")
+        if answer.lower() != "y":
+            typer.echo("cancelled")
+            raise typer.Exit(code=1)
+
+    # Install
+    installed_count = 0
+    skipped_count = 0
+    failed_count = 0
+    console = _make_console(no_color)
+
+    for tool in tools:
+        try:
+            with console.status(f"Installing {tool.name}..."):
+                result = install_tool(tool, force=force, stream=verbose)
+            typer.echo(f"installed {result.name} {result.version}")
+            installed_count += 1
+        except AlreadyInstalled:
+            typer.echo(f"{tool.name} is already installed (use --force to reinstall)")
+            skipped_count += 1
+        except InstallError as e:
+            typer.echo(f"error: {tool.name}: {e}")
+            log = get_logs_dir() / f"install-{tool.name}.log"
+            if log.exists():
+                typer.echo(f"log: {log}")
+            failed_count += 1
+        except Exception as e:
+            typer.echo(f"error: {tool.name}: {e}")
+            log = get_logs_dir() / f"install-{tool.name}.log"
+            if log.exists():
+                typer.echo(f"log: {log}")
+            failed_count += 1
+
+    typer.echo(f"{installed_count} installed, {skipped_count} skipped, {failed_count} failed")
+
+    if failed_count > 0:
+        raise typer.Exit(code=1)
 
 
 @app.command()
 def remove(
     names: Annotated[list[str] | None, typer.Argument(help="Tool names to remove")] = None,
     all_tools: Annotated[bool, typer.Option("--all", help="Remove all installed tools")] = False,
+    yes: Annotated[bool, typer.Option("--yes", "-y", help="Skip confirmation prompt")] = False,
+    verbose: Annotated[bool, typer.Option("--verbose", help="Verbose output")] = False,
+    no_color: Annotated[bool, typer.Option("--no-color", help="Disable colored output")] = False,
 ):
     """Remove installed tools."""
+    if sys.platform != "linux":
+        typer.echo("error: otinstaller currently supports Linux only", err=True)
+        raise typer.Exit(code=1)
     if names is None:
         names = []
-    typer.echo("not implemented yet")
-    raise typer.Exit(code=2)
+
+    if all_tools and names:
+        typer.echo("error: cannot use both names and --all", err=True)
+        raise typer.Exit(code=1)
+
+    if not all_tools and not names:
+        typer.echo("error: specify tool names or --all", err=True)
+        raise typer.Exit(code=1)
+
+    # Get list of tools to remove
+    if all_tools:
+        installed = list_installed()
+        if not installed:
+            typer.echo("nothing to remove")
+            raise typer.Exit(code=0)
+        tools_to_remove = [t.name for t in installed]
+    else:
+        tools_to_remove = names
+
+    # Confirmation
+    if not yes:
+        if not sys.stdin.isatty():
+            typer.echo("error: confirmation needed, run with --yes", err=True)
+            raise typer.Exit(code=1)
+        answer = typer.prompt("Remove? [y/N]", default="n")
+        if answer.lower() != "y":
+            typer.echo("cancelled")
+            raise typer.Exit(code=1)
+
+    # Remove
+    removed_count = 0
+    failed_count = 0
+
+    for name in tools_to_remove:
+        try:
+            if remove_tool(name):
+                typer.echo(f"removed {name}")
+                removed_count += 1
+            else:
+                typer.echo(f"error: {name} is not installed")
+                failed_count += 1
+        except Exception as e:
+            typer.echo(f"error: {name}: {e}")
+            failed_count += 1
+
+    if failed_count > 0:
+        raise typer.Exit(code=1)
 
 
 @app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
@@ -286,10 +478,56 @@ def example(tool: Annotated[str, typer.Argument(help="Tool name")]):
 
 
 @app.command()
-def init():
+def init(
+    yes: Annotated[
+        bool, typer.Option("--yes", "-y", help="Accept notice without prompting")
+    ] = False,
+    verbose: Annotated[bool, typer.Option("--verbose", help="Verbose output")] = False,
+    no_color: Annotated[bool, typer.Option("--no-color", help="Disable colored output")] = False,
+):
     """Initialize configuration and directories."""
-    typer.echo("not implemented yet")
-    raise typer.Exit(code=2)
+    # Create directories
+    ensure_dir(get_home())
+    ensure_dir(get_tools_dir())
+    ensure_dir(get_logs_dir())
+
+    # Handle notice acceptance
+    if not has_accepted():
+        console = _make_console(no_color)
+        console.print(NOTICE_TEXT)
+        if not yes:
+            if not sys.stdin.isatty():
+                typer.echo("error: confirmation needed, run with --yes", err=True)
+                raise typer.Exit(code=1)
+            answer = typer.prompt("Do you accept? [y/N]", default="n")
+            if answer.lower() != "y":
+                typer.echo("notice not accepted", err=True)
+                raise typer.Exit(code=1)
+        record_acceptance()
+
+    # Handle .env file
+    env_file = get_env_file()
+    env_content = (
+        "# API keys for tools managed by otinstaller.\n"
+        "# Add one KEY=value per line. Keep this file private.\n"
+    )
+    if not env_file.exists():
+        env_file.write_text(env_content)
+        os.chmod(env_file, 0o600)
+    else:
+        # Fix permissions if needed
+        try:
+            current_mode = env_file.stat().st_mode & 0o777
+            if current_mode != 0o600:
+                os.chmod(env_file, 0o600)
+                typer.echo(f"fixed permissions on {env_file}")
+        except OSError:
+            pass
+
+    # Print summary
+    typer.echo(f"Home directory: {get_home()}")
+    typer.echo(f"Tools directory: {get_tools_dir()}")
+    typer.echo(f"Env file: {env_file}")
 
 
 keys_app = typer.Typer(no_args_is_help=True, help="Manage API keys.")
