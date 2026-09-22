@@ -1,6 +1,7 @@
 """CLI tests."""
 
 import sys
+from unittest.mock import patch
 
 import pytest
 from typer.testing import CliRunner
@@ -56,7 +57,6 @@ def test_keys_help():
         ["example", "tool1"],
         ["keys", "check"],
         ["resume"],
-        ["doctor"],
     ],
 )
 def test_stub_commands_exit_2(cmd_args):
@@ -444,3 +444,535 @@ def test_help_no_osint_still():
     result = runner.invoke(app, ["--help"])
     assert result.exit_code == 0
     assert "osint" not in result.output.lower()
+
+
+def test_install_refuses_before_init(monkeypatch, tmp_path):
+    """install refuses before init."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    tools = [
+        {
+            "name": "sherlock",
+            "display_name": "Sherlock",
+            "description": "Search usernames",
+            "install": {"method": "pip", "package": "sherlock-project"},
+            "entrypoint": {"command": "sherlock"},
+            "capabilities": ["username-search"],
+        }
+    ]
+    reg = make_registry_yaml(tmp_path, tools)
+    monkeypatch.setenv("OTINSTALLER_REGISTRY", str(reg))
+
+    result = runner.invoke(app, ["install", "sherlock", "--yes"])
+    assert result.exit_code == 1
+    assert "error: run 'otinstaller init' first" in result.output
+
+
+def test_install_unknown_name_gives_suggestions(monkeypatch, tmp_path):
+    """unknown name gives suggestions."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    monkeypatch.setenv(
+        "OTINSTALLER_REGISTRY",
+        str(
+            make_registry_yaml(
+                tmp_path,
+                [
+                    {
+                        "name": "sherlock",
+                        "display_name": "Sherlock",
+                        "description": "Search usernames",
+                        "install": {"method": "pip", "package": "sherlock-project"},
+                        "entrypoint": {"command": "sherlock"},
+                        "capabilities": [],
+                    }
+                ],
+            )
+        ),
+    )
+    # Run init first
+    runner.invoke(app, ["init", "--yes"])
+
+    result = runner.invoke(app, ["install", "sherlok", "--yes"])
+    assert result.exit_code == 1
+    assert "error: unknown tool 'sherlok'" in result.output
+    assert "did you mean: sherlock?" in result.output
+
+
+def test_install_no_tty_without_yes_refuses(monkeypatch, tmp_path):
+    """no terminal without --yes refuses."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    monkeypatch.setenv(
+        "OTINSTALLER_REGISTRY",
+        str(
+            make_registry_yaml(
+                tmp_path,
+                [
+                    {
+                        "name": "sherlock",
+                        "display_name": "Sherlock",
+                        "description": "Search usernames",
+                        "install": {"method": "pip", "package": "sherlock-project"},
+                        "entrypoint": {"command": "sherlock"},
+                        "capabilities": [],
+                    }
+                ],
+            )
+        ),
+    )
+    runner.invoke(app, ["init", "--yes"])
+
+    # Without --yes and no tty
+    result = runner.invoke(app, ["install", "sherlock"], input="")
+    assert result.exit_code == 1
+    assert "confirmation needed" in result.output
+    assert "--yes" in result.output
+
+
+def test_install_one_failure_continues_and_exits_1(monkeypatch, tmp_path):
+    """one failure among several continues and exits 1."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    tools = [
+        {
+            "name": "goodtool",
+            "display_name": "Good Tool",
+            "description": "A good tool",
+            "install": {"method": "pip", "package": "goodtool"},
+            "entrypoint": {"command": "goodtool"},
+            "capabilities": [],
+        },
+        {
+            "name": "badtool",
+            "display_name": "Bad Tool",
+            "description": "A bad tool",
+            "install": {"method": "pip", "package": "badtool"},
+            "entrypoint": {"command": "badtool"},
+            "capabilities": [],
+        },
+    ]
+    reg = make_registry_yaml(tmp_path, tools)
+    monkeypatch.setenv("OTINSTALLER_REGISTRY", str(reg))
+    runner.invoke(app, ["init", "--yes"])
+
+    # Mock install_tool to succeed for goodtool, fail for badtool
+    import datetime
+
+    from otinstaller.installer import InstallError
+    from otinstaller.state import InstalledTool
+
+    def mock_install_tool(tool, force=False, stream=False):
+        if tool.name == "goodtool":
+            now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+            return InstalledTool(
+                name="goodtool",
+                version="1.0",
+                method="pip",
+                source="goodtool",
+                ref=None,
+                commit=None,
+                entry_command="goodtool",
+                entry_script=None,
+                installed_at=now,
+                updated_at=now,
+            )
+        else:
+            raise InstallError("simulated failure")
+
+    with patch("otinstaller.cli.install_tool", side_effect=mock_install_tool):
+        result = runner.invoke(app, ["install", "goodtool", "badtool", "--yes"])
+
+    assert result.exit_code == 1
+    assert "installed goodtool" in result.output
+    assert "error: badtool" in result.output
+    assert "1 installed, 0 skipped, 1 failed" in result.output
+
+
+def test_remove_single_tool(monkeypatch, tmp_path):
+    """remove single tool."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    tools = [
+        {
+            "name": "sherlock",
+            "display_name": "Sherlock",
+            "description": "Search usernames",
+            "install": {"method": "pip", "package": "sherlock-project"},
+            "entrypoint": {"command": "sherlock"},
+            "capabilities": [],
+        }
+    ]
+    reg = make_registry_yaml(tmp_path, tools)
+    monkeypatch.setenv("OTINSTALLER_REGISTRY", str(reg))
+    runner.invoke(app, ["init", "--yes"])
+
+    # Mock install and remove
+    import datetime
+
+    from otinstaller.state import InstalledTool
+
+    def mock_install_tool(tool, force=False, stream=False):
+        now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        return InstalledTool(
+            name=tool.name,
+            version="1.0",
+            method="pip",
+            source=tool.install.package,
+            ref=None,
+            commit=None,
+            entry_command=tool.name,
+            entry_script=None,
+            installed_at=now,
+            updated_at=now,
+        )
+
+    with patch("otinstaller.cli.install_tool", side_effect=mock_install_tool):
+        with patch("otinstaller.cli.remove_tool", return_value=True) as mock_remove:
+            result = runner.invoke(app, ["install", "sherlock", "--yes"])
+            assert result.exit_code == 0
+
+            result = runner.invoke(app, ["remove", "sherlock", "--yes"])
+            assert result.exit_code == 0
+            assert "removed sherlock" in result.output
+            mock_remove.assert_called_once_with("sherlock")
+
+
+def test_remove_all_tools(monkeypatch, tmp_path):
+    """remove --all removes all tools."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    tools = [
+        {
+            "name": "sherlock",
+            "display_name": "Sherlock",
+            "description": "Search usernames",
+            "install": {"method": "pip", "package": "sherlock-project"},
+            "entrypoint": {"command": "sherlock"},
+            "capabilities": [],
+        },
+        {
+            "name": "maigret",
+            "display_name": "Maigret",
+            "description": "Build profile",
+            "install": {"method": "pip", "package": "maigret"},
+            "entrypoint": {"command": "maigret"},
+            "capabilities": [],
+        },
+    ]
+    reg = make_registry_yaml(tmp_path, tools)
+    monkeypatch.setenv("OTINSTALLER_REGISTRY", str(reg))
+    runner.invoke(app, ["init", "--yes"])
+
+    import datetime
+
+    from otinstaller.state import InstalledTool
+
+    def mock_install_tool(tool, force=False, stream=False):
+        now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        return InstalledTool(
+            name=tool.name,
+            version="1.0",
+            method="pip",
+            source=tool.install.package,
+            ref=None,
+            commit=None,
+            entry_command=tool.name,
+            entry_script=None,
+            installed_at=now,
+            updated_at=now,
+        )
+
+    with patch("otinstaller.cli.install_tool", side_effect=mock_install_tool):
+        with patch("otinstaller.cli.list_installed") as mock_list:
+            with patch("otinstaller.cli.remove_tool", return_value=True) as mock_remove:
+                mock_list.return_value = [
+                    InstalledTool(
+                        name="sherlock",
+                        version="1.0",
+                        method="pip",
+                        source="sherlock-project",
+                        ref=None,
+                        commit=None,
+                        entry_command="sherlock",
+                        entry_script=None,
+                        installed_at="2024-01-01T00:00:00+00:00",
+                        updated_at="2024-01-01T00:00:00+00:00",
+                    ),
+                    InstalledTool(
+                        name="maigret",
+                        version="1.0",
+                        method="pip",
+                        source="maigret",
+                        ref=None,
+                        commit=None,
+                        entry_command="maigret",
+                        entry_script=None,
+                        installed_at="2024-01-01T00:00:00+00:00",
+                        updated_at="2024-01-01T00:00:00+00:00",
+                    ),
+                ]
+                result = runner.invoke(app, ["remove", "--all", "--yes"])
+                assert result.exit_code == 0
+                assert mock_remove.call_count == 2
+
+
+def test_remove_unknown_tool(monkeypatch, tmp_path):
+    """remove unknown tool returns error."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    runner.invoke(app, ["init", "--yes"])
+
+    with patch("otinstaller.cli.remove_tool", return_value=False):
+        result = runner.invoke(app, ["remove", "unknown", "--yes"])
+        assert result.exit_code == 1
+        assert "error: unknown is not installed" in result.output
+
+
+def test_list_installed_table_with_data(monkeypatch, tmp_path):
+    """list --installed table with data."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    from otinstaller.state import InstalledTool
+
+    with patch("otinstaller.cli.list_installed") as mock_list:
+        mock_list.return_value = [
+            InstalledTool(
+                name="sherlock",
+                version="1.0",
+                method="pip",
+                source="sherlock-project",
+                ref=None,
+                commit=None,
+                entry_command="sherlock",
+                entry_script=None,
+                installed_at="2024-01-15T12:00:00+00:00",
+                updated_at="2024-01-15T12:00:00+00:00",
+            ),
+        ]
+        result = runner.invoke(app, ["list", "--installed"])
+        assert result.exit_code == 0
+        assert "sherlock" in result.output
+        assert "1.0" in result.output
+        assert "pip" in result.output
+        assert "2024-01-15" in result.output
+        assert "1 tool" in result.output
+
+
+def test_list_installed_json_with_data(monkeypatch, tmp_path):
+    """list --installed --json with data."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    import json
+
+    from otinstaller.state import InstalledTool
+
+    with patch("otinstaller.cli.list_installed") as mock_list:
+        mock_list.return_value = [
+            InstalledTool(
+                name="sherlock",
+                version="1.0",
+                method="pip",
+                source="sherlock-project",
+                ref=None,
+                commit=None,
+                entry_command="sherlock",
+                entry_script=None,
+                installed_at="2024-01-15T12:00:00+00:00",
+                updated_at="2024-01-15T12:00:00+00:00",
+            ),
+        ]
+        result = runner.invoke(app, ["list", "--installed", "--json"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert len(data) == 1
+        assert data[0]["name"] == "sherlock"
+        assert data[0]["version"] == "1.0"
+
+
+def test_list_installed_singular(monkeypatch, tmp_path):
+    """list --installed shows '1 tool' not '1 tools'."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    from otinstaller.state import InstalledTool
+
+    with patch("otinstaller.cli.list_installed") as mock_list:
+        mock_list.return_value = [
+            InstalledTool(
+                name="sherlock",
+                version="1.0",
+                method="pip",
+                source="sherlock-project",
+                ref=None,
+                commit=None,
+                entry_command="sherlock",
+                entry_script=None,
+                installed_at="2024-01-15T12:00:00+00:00",
+                updated_at="2024-01-15T12:00:00+00:00",
+            ),
+        ]
+        result = runner.invoke(app, ["list", "--installed"])
+        assert result.exit_code == 0
+        assert "1 tool" in result.output
+        assert "1 tools" not in result.output
+
+
+def test_doctor_all_ok(monkeypatch, tmp_path):
+    """doctor exits 0 when all checks pass."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    monkeypatch.setattr("sys.platform", "linux")
+    monkeypatch.setattr("sys.version_info", (3, 12, 0, "final", 0))
+    monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git" if x == "git" else None)
+
+    def mock_run(*args, **kwargs):
+        class Result:
+            returncode = 0
+        return Result()
+
+    monkeypatch.setattr("subprocess.run", mock_run)
+
+    result = runner.invoke(app, ["doctor"])
+    assert result.exit_code == 0
+    assert "[ok] platform is Linux" in result.output
+    assert "[ok] git found" in result.output
+    assert "[ok] venv module works" in result.output
+    assert "[ok] home directory writable" in result.output
+
+
+def test_doctor_not_linux(monkeypatch, tmp_path):
+    """doctor exits 1 on non-Linux."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    monkeypatch.setattr("sys.platform", "win32")
+
+    result = runner.invoke(app, ["doctor"])
+    assert result.exit_code == 1
+    assert "[problem] platform is not Linux" in result.output
+
+
+def test_doctor_python_version_problem(monkeypatch, tmp_path):
+    """doctor exits 1 when Python version is not supported."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    monkeypatch.setattr("sys.platform", "linux")
+    monkeypatch.setattr("sys.version_info", (3, 14, 0, "final", 0))
+    monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git" if x == "git" else None)
+
+    def mock_run(*args, **kwargs):
+        class Result:
+            returncode = 0
+        return Result()
+
+    monkeypatch.setattr("subprocess.run", mock_run)
+
+    result = runner.invoke(app, ["doctor"])
+    assert result.exit_code == 1
+    assert "[problem] python 3.14 is not supported" in result.output
+    assert "this project targets 3.10-3.12" in result.output
+
+
+def test_doctor_git_missing_debian(monkeypatch, tmp_path):
+    """doctor shows debian install command when git is missing."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    monkeypatch.setattr("sys.platform", "linux")
+    monkeypatch.setattr("sys.version_info", (3, 12, 0, "final", 0))
+    monkeypatch.setattr("shutil.which", lambda x: None)
+    monkeypatch.setattr("otinstaller.config.get_distro_family", lambda: "debian")
+
+    def mock_run(*args, **kwargs):
+        class Result:
+            returncode = 0
+        return Result()
+
+    monkeypatch.setattr("subprocess.run", mock_run)
+
+    result = runner.invoke(app, ["doctor"])
+    assert result.exit_code == 1
+    assert "[problem] git not found" in result.output
+    assert "sudo apt install git" in result.output
+
+
+def test_doctor_git_missing_arch(monkeypatch, tmp_path):
+    """doctor shows arch install command when git is missing."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    monkeypatch.setattr("sys.platform", "linux")
+    monkeypatch.setattr("sys.version_info", (3, 12, 0, "final", 0))
+    monkeypatch.setattr("shutil.which", lambda x: None)
+
+    # Mock distro detection
+    os_release = tmp_path / "os-release"
+    os_release.write_text('ID="arch"\n')
+    monkeypatch.setattr("otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x))
+
+    def mock_run(*args, **kwargs):
+        class Result:
+            returncode = 0
+        return Result()
+
+    monkeypatch.setattr("subprocess.run", mock_run)
+
+    result = runner.invoke(app, ["doctor"])
+    assert result.exit_code == 1
+    assert "[problem] git not found" in result.output
+    assert "sudo pacman -S git" in result.output
+
+
+def test_doctor_venv_broken_debian(monkeypatch, tmp_path):
+    """doctor shows debian install command when venv is broken."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    monkeypatch.setattr("sys.platform", "linux")
+    monkeypatch.setattr("sys.version_info", (3, 12, 0, "final", 0))
+    monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git" if x == "git" else None)
+    monkeypatch.setattr("otinstaller.config.get_distro_family", lambda: "debian")
+
+    def mock_run(*args, **kwargs):
+        class Result:
+            returncode = 1
+        return Result()
+
+    monkeypatch.setattr("subprocess.run", mock_run)
+
+    result = runner.invoke(app, ["doctor"])
+    assert result.exit_code == 1
+    assert "[problem] venv module failed" in result.output
+    assert "python3.12-venv" in result.output
+
+
+def test_doctor_venv_broken_arch(monkeypatch, tmp_path):
+    """doctor shows arch message when venv is broken."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    monkeypatch.setattr("sys.platform", "linux")
+    monkeypatch.setattr("sys.version_info", (3, 12, 0, "final", 0))
+    monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git" if x == "git" else None)
+
+    # Mock distro detection
+    os_release = tmp_path / "os-release"
+    os_release.write_text('ID="arch"\n')
+    monkeypatch.setattr("otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x))
+
+    def mock_run(*args, **kwargs):
+        class Result:
+            returncode = 1
+        return Result()
+
+    monkeypatch.setattr("subprocess.run", mock_run)
+
+    result = runner.invoke(app, ["doctor"])
+    assert result.exit_code == 1
+    assert "[problem] venv module failed" in result.output
+    assert "should be included with python on Arch" in result.output
+
+
+def test_doctor_home_not_writable(monkeypatch, tmp_path):
+    """doctor fails when home is not writable."""
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    monkeypatch.setattr("sys.platform", "linux")
+    monkeypatch.setattr("sys.version_info", (3, 12, 0, "final", 0))
+    monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git" if x == "git" else None)
+    monkeypatch.setattr("otinstaller.config.get_distro_family", lambda: "debian")
+
+    def mock_run(*args, **kwargs):
+        class Result:
+            returncode = 0
+        return Result()
+
+    monkeypatch.setattr("subprocess.run", mock_run)
+
+    # Make home directory not writable
+    home = tmp_path
+    home.chmod(0o555)
+
+    result = runner.invoke(app, ["doctor"])
+    assert result.exit_code == 1
+    assert "[problem] home directory not writable" in result.output
+
+    # Restore permissions for cleanup
+    home.chmod(0o755)

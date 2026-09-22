@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -14,6 +15,8 @@ from rich.table import Table
 from otinstaller import __version__
 from otinstaller.config import (
     ensure_dir,
+    get_distro,
+    get_distro_family,
     get_env_file,
     get_home,
     get_logs_dir,
@@ -549,7 +552,98 @@ def resume():
 
 
 @app.command()
-def doctor():
+def doctor(
+    verbose: Annotated[bool, typer.Option("--verbose", help="Verbose output")] = False,
+    no_color: Annotated[bool, typer.Option("--no-color", help="Disable colored output")] = False,
+):
     """Run diagnostics."""
-    typer.echo("not implemented yet")
-    raise typer.Exit(code=2)
+    import shutil
+    import subprocess
+    import sys
+    import tempfile
+
+    problems = 0
+
+    # 1. Platform check
+    if sys.platform != "linux":
+        typer.echo("[problem] platform is not Linux")
+        problems += 1
+        if not verbose:
+            raise typer.Exit(code=1)
+    else:
+        typer.echo("[ok] platform is Linux")
+
+    # 2. Distro detection (informational)
+    distro = get_distro()
+    typer.echo(f"[ok] distro: {distro}")
+
+    # 3. Python version
+    major, minor = sys.version_info[:2]
+    if major == 3 and 10 <= minor <= 12:
+        typer.echo(f"[ok] python {major}.{minor} is supported")
+    else:
+        typer.echo(
+            f"[problem] python {major}.{minor} is not supported, "
+            f"this project targets 3.10-3.12"
+        )
+        problems += 1
+
+    # 4. git check
+    if shutil.which("git"):
+        typer.echo("[ok] git found")
+    else:
+        typer.echo("[problem] git not found")
+        family = get_distro_family()
+        if family == "debian":
+            typer.echo("  install with: sudo apt install git")
+        elif family == "arch":
+            typer.echo("  install with: sudo pacman -S git")
+        else:
+            typer.echo("  install git with your package manager")
+        problems += 1
+
+    # 5. venv module check
+    venv_ok = False
+    with tempfile.TemporaryDirectory() as tmpdir:
+        venv_path = Path(tmpdir) / "test_venv"
+        result = subprocess.run(
+            [sys.executable, "-m", "venv", str(venv_path)],
+            capture_output=True,
+        )
+        if result.returncode == 0:
+            venv_ok = True
+
+    if venv_ok:
+        typer.echo("[ok] venv module works")
+    else:
+        typer.echo("[problem] venv module failed")
+        family = get_distro_family()
+        py_version = f"python{major}.{minor}"
+        if family == "debian":
+            typer.echo(f"  install with: sudo apt install {py_version}-venv")
+        elif family == "arch":
+            typer.echo("  should be included with python on Arch, check your install")
+        else:
+            typer.echo("  install python-venv with your package manager")
+        problems += 1
+
+    # 6. Home directory writable
+    home_ok = False
+    try:
+        home = get_home()
+        home.mkdir(parents=True, exist_ok=True)
+        test_file = home / ".write_test"
+        test_file.write_text("test")
+        test_file.unlink()
+        home_ok = True
+    except Exception:
+        pass
+
+    if home_ok:
+        typer.echo("[ok] home directory writable")
+    else:
+        typer.echo("[problem] home directory not writable")
+        problems += 1
+
+    if problems > 0:
+        raise typer.Exit(code=1)
