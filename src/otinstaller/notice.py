@@ -17,3 +17,38 @@ NOTICE_SHORT = (
     "You are solely responsible for how you use these tools and for complying with all "
     "applicable laws. Use them only on targets you are authorized to investigate."
 )
+
+NOTICE_VERSION = "1"
+
+
+def has_accepted() -> bool:
+    """Check if the user has accepted the notice."""
+    import json
+
+    from otinstaller.config import get_accept_path
+
+    path = get_accept_path()
+    if not path.exists():
+        return False
+    try:
+        data = json.loads(path.read_text())
+        return data.get("version") == NOTICE_VERSION
+    except (json.JSONDecodeError, OSError):
+        return False
+
+
+def record_acceptance() -> None:
+    """Record the user's acceptance of the notice."""
+    import datetime
+    import json
+    import os
+
+    from otinstaller.config import get_accept_path
+
+    path = get_accept_path()
+    data = {
+        "version": NOTICE_VERSION,
+        "accepted_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    }
+    path.write_text(json.dumps(data))
+    os.chmod(path, 0o600)
