@@ -19,6 +19,26 @@ The otinstaller home directory (default `~/.otinstaller/`, configurable via `OTI
 └── .env                # API keys (mode 600)
 ```
 
+Results are saved under `./results/` (or `OTINSTALLER_RESULTS_DIR`) by default:
+
+```
+results/
+├── <tool>/
+│   └── <sanitized-target>/
+│       └── <timestamp>_<tool>_<sanitized-target>_<runid>.txt
+│       └── <timestamp>_<tool>_<sanitized-target>_<runid>.meta.json
+└── cases/
+    └── <sanitized-case>/
+        └── <tool>/
+            └── <sanitized-target>/
+                └── <timestamp>_<tool>_<sanitized-target>_<runid>.txt
+                └── <timestamp>_<tool>_<sanitized-target>_<runid>.meta.json
+```
+
+## Platform support
+
+Linux only, tested on Ubuntu 22.04/24.04, Debian 12 and Arch Linux via CI; Kali Linux checked manually before release (it is Debian-based).
+
 ## Tool installation
 
 Each tool gets its own directory under `tools/<name>/`. The virtualenv is always created at `tools/<name>/venv/`. For git-based tools, the source is cloned to `tools/<name>/src/`.

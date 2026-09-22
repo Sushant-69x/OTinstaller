@@ -4,6 +4,10 @@ Install, run and update command line tools by name.
 
 Status: early development, not published yet.
 
+## Platform support
+
+Linux only, tested on Ubuntu 22.04/24.04, Debian 12 and Arch Linux via CI; Kali Linux checked manually before release (it is Debian-based).
+
 ## Install
 
 ```bash
@@ -11,6 +15,10 @@ pip install otinstaller
 ```
 
 (Not published yet.)
+
+## Troubleshooting
+
+Run `otinstaller doctor` to check your environment for common issues.
 
 ## Responsible use
 
