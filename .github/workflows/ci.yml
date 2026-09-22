@@ -25,3 +25,43 @@ jobs:
         run: ruff format --check .
       - name: Run tests
         run: pytest
+
+  test-debian:
+    # Debian 12 (bookworm) - Kali is Debian-based and covered by this
+    runs-on: ubuntu-24.04
+    container: debian:12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system dependencies
+        run: |
+          apt-get update && apt-get install -y python3 python3-venv python3-pip git
+      - name: Install project
+        run: pip install -e ".[dev]"
+      - name: Ruff check
+        run: ruff check .
+      - name: Ruff format check
+        run: ruff format --check .
+      - name: Run tests
+        run: pytest
+        env:
+          RUN_NETWORK_TESTS: "0"
+
+  test-arch:
+    # Arch Linux
+    runs-on: ubuntu-24.04
+    container: archlinux:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system dependencies
+        run: |
+          pacman -Sy --noconfirm python python-pip git
+      - name: Install project
+        run: pip install -e ".[dev]"
+      - name: Ruff check
+        run: ruff check .
+      - name: Ruff format check
+        run: ruff format --check .
+      - name: Run tests
+        run: pytest
+        env:
+          RUN_NETWORK_TESTS: "0"
