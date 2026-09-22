@@ -29,3 +29,28 @@ def ensure_dir(path: Path) -> Path:
     """Create directory and return it."""
     path.mkdir(parents=True, exist_ok=True)
     return path
+
+
+def get_tools_dir() -> Path:
+    """Return the tools directory."""
+    return get_home() / "tools"
+
+
+def get_logs_dir() -> Path:
+    """Return the logs directory."""
+    return get_home() / "logs"
+
+
+def get_state_path() -> Path:
+    """Return the path to the state database."""
+    return get_home() / "state.db"
+
+
+def get_accept_path() -> Path:
+    """Return the path to the acceptance file."""
+    return get_home() / "accepted.json"
+
+
+def tool_dir(name: str) -> Path:
+    """Return the directory for a specific tool."""
+    return get_tools_dir() / name
