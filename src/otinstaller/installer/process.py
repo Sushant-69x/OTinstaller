@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import signal
 import subprocess
 from pathlib import Path
 
@@ -21,6 +22,61 @@ def _base_env() -> dict[str, str]:
     return env
 
 
+def _run_with_cleanup(
+    args: list[str],
+    *,
+    log: Path,
+    cwd: Path | None = None,
+    timeout: int = 900,
+    stream: bool = False,
+) -> subprocess.CompletedProcess | None:
+    """Run a command with proper cleanup on KeyboardInterrupt.
+
+    Creates the child in its own process group so we can kill it and all its
+    descendants on interrupt.
+    """
+    cmd_str = " ".join(args)
+    log.parent.mkdir(parents=True, exist_ok=True)
+    with log.open("a", encoding="utf-8", errors="replace") as f:
+        f.write(f"$ {cmd_str}\n")
+    env = _base_env()
+
+    # Use Popen with start_new_session to create a new process group
+    proc = subprocess.Popen(
+        args,
+        cwd=cwd,
+        env=env,
+        start_new_session=True,
+        stdout=subprocess.PIPE if not stream else None,
+        stderr=subprocess.PIPE if not stream else None,
+        text=True if not stream else False,
+    )
+
+    try:
+        if stream:
+            proc.wait(timeout=timeout)
+            return None
+        else:
+            stdout, stderr = proc.communicate(timeout=timeout)
+            return subprocess.CompletedProcess(args, proc.returncode, stdout, stderr)
+    except subprocess.TimeoutExpired:
+        # Kill the entire process group on timeout
+        try:
+            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+        except OSError:
+            pass
+        proc.wait(timeout=5)
+        raise InstallError(f"timed out after {timeout} seconds: {args[0]}") from None
+    except BaseException:
+        # On any other exception (including KeyboardInterrupt), kill the process group
+        try:
+            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+        except OSError:
+            pass
+        proc.wait(timeout=5)
+        raise
+
+
 def run(
     args: list[str],
     *,
@@ -30,36 +86,13 @@ def run(
     stream: bool = False,
 ) -> None:
     """Run a command, logging output to a file."""
-    cmd_str = " ".join(args)
-    log.parent.mkdir(parents=True, exist_ok=True)
-    with log.open("a", encoding="utf-8", errors="replace") as f:
-        f.write(f"$ {cmd_str}\n")
-    env = _base_env()
-    try:
-        if stream:
-            subprocess.run(
-                args,
-                cwd=cwd,
-                timeout=timeout,
-                check=True,
-                env=env,
-            )
-        else:
-            result = subprocess.run(
-                args,
-                cwd=cwd,
-                timeout=timeout,
-                capture_output=True,
-                text=True,
-                env=env,
-            )
-            with log.open("a", encoding="utf-8", errors="replace") as f:
-                f.write(result.stdout or "")
-                f.write(result.stderr or "")
-            if result.returncode != 0:
-                _raise_from_log(args[0], log)
-    except subprocess.TimeoutExpired as e:
-        raise InstallError(f"timed out after {timeout} seconds: {args[0]}") from e
+    result = _run_with_cleanup(args, log=log, cwd=cwd, timeout=timeout, stream=stream)
+    if result is not None:
+        with log.open("a", encoding="utf-8", errors="replace") as f:
+            f.write(result.stdout or "")
+            f.write(result.stderr or "")
+        if result.returncode != 0:
+            _raise_from_log(args[0], log)
 
 
 def run_capture(
