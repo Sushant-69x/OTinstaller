@@ -20,6 +20,11 @@ tools:
     entrypoint:
       command: maigret
     capabilities: ["username-search"]
+    verified:
+      date: "2026-09-22"
+      version: "0.6.6"
+      os: "Ubuntu 26.04 LTS via WSL2"
+      python: "3.12.14"
 
   - name: theharvester
     display_name: "theHarvester"
@@ -28,9 +33,15 @@ tools:
     install:
       method: git
       url: https://github.com/laramies/theHarvester.git
+      ref: "4.11.1"
       as_package: true
     entrypoint:
       command: theHarvester
     capabilities: ["domain-recon", "email-search"]
     api_keys:
       optional: ["SHODAN_API_KEY", "HUNTER_API_KEY"]
+    verified:
+      date: "2026-09-22"
+      version: "4.11.1"
+      os: "Ubuntu 26.04 LTS via WSL2"
+      python: "3.12.14"
