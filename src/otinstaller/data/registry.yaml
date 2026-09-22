@@ -10,6 +10,7 @@ tools:
       command: sherlock
     smoke_args: ["--help"]
     capabilities: ["username-search"]
+    accepts: ["username"]
 
   - name: maigret
     display_name: "Maigret"
@@ -25,6 +26,7 @@ tools:
       version: "0.6.6"
       os: "Ubuntu 26.04 LTS via WSL2"
       python: "3.12.14"
+    accepts: ["username"]
 
   - name: theharvester
     display_name: "theHarvester"
@@ -45,3 +47,4 @@ tools:
       version: "4.11.1"
       os: "Ubuntu 26.04 LTS via WSL2"
       python: "3.12.14"
+    accepts: ["domain"]

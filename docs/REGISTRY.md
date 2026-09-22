@@ -23,6 +23,22 @@ The registry is a YAML file with a top-level `tools` list. Each entry describes 
 | resume_flag | string | no | Flag to pass for resume support |
 | example | string | no | Relative path to sample output file |
 | verified | object | no | Verification info, see below |
+| accepts | list[string] | no | Target types this tool accepts (see below) |
+
+## Accepts field
+
+The `accepts` field specifies what types of targets this tool can operate on. This enables future auto-mode features where otinstaller can suggest or filter tools based on the target type.
+
+Allowed values:
+- `username` - Username or handle (e.g., sherlock, maigret)
+- `email` - Email address
+- `domain` - Domain name (e.g., theharvester)
+- `ip` - IP address
+- `phone` - Phone number
+- `url` - URL
+- `name` - Person's name
+
+Each value must be one of the above. Unknown values raise a validation error.
 
 ## Install object
 

@@ -497,3 +497,51 @@ def test_tool_sorted_by_name():
     tools_list.sort(key=lambda t: t.name)
     assert tools_list[0].name == "atool"
     assert tools_list[1].name == "ztool"
+
+
+def test_accepts_field_valid_values():
+    data = {
+        "name": "testtool",
+        "display_name": "Test Tool",
+        "description": "Test",
+        "install": {"method": "pip", "package": "test"},
+        "entrypoint": {"command": "test"},
+        "accepts": ["username", "email", "domain", "ip", "phone", "url", "name"],
+    }
+    tool = parse_tool(data)
+    assert tool.accepts == (
+        "username",
+        "email",
+        "domain",
+        "ip",
+        "phone",
+        "url",
+        "name",
+    )
+
+
+def test_accepts_field_invalid_value():
+    data = {
+        "name": "testtool",
+        "display_name": "Test Tool",
+        "description": "Test",
+        "install": {"method": "pip", "package": "test"},
+        "entrypoint": {"command": "test"},
+        "accepts": ["username", "invalid_value"],
+    }
+    with pytest.raises(RegistryError) as exc:
+        parse_tool(data)
+    assert "accepts value 'invalid_value' must be one of" in str(exc.value)
+    assert "username" in str(exc.value)
+
+
+def test_accepts_field_default_empty():
+    data = {
+        "name": "testtool",
+        "display_name": "Test Tool",
+        "description": "Test",
+        "install": {"method": "pip", "package": "test"},
+        "entrypoint": {"command": "test"},
+    }
+    tool = parse_tool(data)
+    assert tool.accepts == ()

@@ -49,6 +49,17 @@ class Verification:
     python: str
 
 
+_ACCEPTS_VALUES = (
+    "username",
+    "email",
+    "domain",
+    "ip",
+    "phone",
+    "url",
+    "name",
+)
+
+
 @dataclass(frozen=True)
 class Tool:
     name: str
@@ -68,6 +79,7 @@ class Tool:
     resume_flag: str | None = None
     example: str | None = None
     verified: Verification | None = None
+    accepts: tuple[str, ...] = ()
 
 
 _NAME_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,39}$")
@@ -201,6 +213,15 @@ def _validate_capabilities_topics(values: tuple[str, ...], field: str, tool_name
             )
 
 
+def _validate_accepts(values: tuple[str, ...], tool_name: str) -> None:
+    for v in values:
+        if v not in _ACCEPTS_VALUES:
+            raise RegistryError(
+                f"tool '{tool_name}': accepts value '{v}' must be one of "
+                f"{', '.join(_ACCEPTS_VALUES)}"
+            )
+
+
 def _validate_api_keys(api_keys: ApiKeys, tool_name: str) -> None:
     for key in api_keys.required:
         if not _API_KEY_RE.match(key):
@@ -234,6 +255,7 @@ def _validate_unknown_keys(data: dict, tool_name: str) -> None:
         "resume_flag",
         "example",
         "verified",
+        "accepts",
     }
     for key in data:
         if key not in known_keys:
@@ -278,6 +300,9 @@ def parse_tool(data: dict) -> Tool:
     topics = tuple(data.get("topics", []))
     _validate_capabilities_topics(topics, "topics", tool_name)
 
+    accepts = tuple(data.get("accepts", []))
+    _validate_accepts(accepts, tool_name)
+
     api_keys_data = data.get("api_keys", {})
     api_keys = ApiKeys(
         required=tuple(api_keys_data.get("required", [])),
@@ -316,6 +341,7 @@ def parse_tool(data: dict) -> Tool:
         resume_flag=data.get("resume_flag"),
         example=data.get("example"),
         verified=verified,
+        accepts=accepts,
     )
 
 
