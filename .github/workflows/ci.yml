@@ -35,14 +35,16 @@ jobs:
       - name: Install system dependencies
         run: |
           apt-get update && apt-get install -y python3 python3-venv python3-pip git
+      - name: Create virtualenv
+        run: python3 -m venv .venv
       - name: Install project
-        run: pip install -e ".[dev]"
+        run: .venv/bin/pip install -e ".[dev]"
       - name: Ruff check
-        run: ruff check .
+        run: .venv/bin/ruff check .
       - name: Ruff format check
-        run: ruff format --check .
+        run: .venv/bin/ruff format --check .
       - name: Run tests
-        run: pytest
+        run: .venv/bin/pytest
         env:
           RUN_NETWORK_TESTS: "0"
 
@@ -55,13 +57,15 @@ jobs:
       - name: Install system dependencies
         run: |
           pacman -Sy --noconfirm python python-pip git
+      - name: Create virtualenv
+        run: python -m venv .venv
       - name: Install project
-        run: pip install -e ".[dev]"
+        run: .venv/bin/pip install -e ".[dev]"
       - name: Ruff check
-        run: ruff check .
+        run: .venv/bin/ruff check .
       - name: Ruff format check
-        run: ruff format --check .
+        run: .venv/bin/ruff format --check .
       - name: Run tests
-        run: pytest
+        run: .venv/bin/pytest
         env:
           RUN_NETWORK_TESTS: "0"
