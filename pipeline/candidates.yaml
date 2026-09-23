@@ -1,18 +1,1175 @@
 - name: sherlock
   repo: sherlock-project/sherlock
-  stars: 92529
+  stars: 92545
   description: Hunt down social media accounts by username across social networks
   license: MIT
   detected_install_method: pip-repo
+  likely_installable: true
   candidate_pip_package: sherlock
   default_branch: master
-  discovered_at: '2026-09-23T14:38:24.460161+00:00'
+  discovered_at: '2026-09-23T20:25:27.701816+00:00'
 - name: maigret
   repo: soxoj/maigret
-  stars: 37914
+  stars: 37921
   description: 🕵️‍♂️ Collect a dossier on a person by username from 6K websites
   license: MIT
   detected_install_method: pip-repo
+  likely_installable: true
   candidate_pip_package: maigret
   default_branch: main
-  discovered_at: '2026-09-23T14:38:25.396429+00:00'
+  discovered_at: '2026-09-23T20:25:28.467597+00:00'
+- name: anthropic-cybersecurity-skills
+  repo: mukul975/Anthropic-Cybersecurity-Skills
+  stars: 33278
+  description: '817 structured cybersecurity skills for AI agents · Mapped to 6 frameworks:
+    MITRE ATT&CK, NIST CSF 2.0, MITRE ATLAS, D3FEND, NIST AI RMF & MITRE F3 (Fight
+    Fraud) · agentskills.io standard · Works with...'
+  license: Apache-2.0
+  detected_install_method: unknown
+  likely_installable: false
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:25:29.830449+00:00'
+- name: spiderfoot
+  repo: smicallef/spiderfoot
+  stars: 22469
+  description: SpiderFoot automates OSINT for threat intelligence and mapping your
+    attack surface.
+  license: MIT
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:30.914291+00:00'
+- name: ghunt
+  repo: mxrch/GHunt
+  stars: 19596
+  description: 🕵️‍♂️ Offensive Google framework.
+  license: NOASSERTION
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: ghunt
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:31.613796+00:00'
+- name: theharvester
+  repo: laramies/theHarvester
+  stars: 17586
+  description: E-mails, subdomains and names Harvester - OSINT
+  license: GPL-2.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: theharvester
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:32.325708+00:00'
+- name: ghosttrack
+  repo: HunxByts/GhostTrack
+  stars: 15127
+  description: Useful tool to track location or mobile number
+  license: unknown
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:25:33.313063+00:00'
+- name: holehe
+  repo: megadose/holehe
+  stars: 14986
+  description: holehe allows you to check if the mail is used on different sites like
+    twitter, instagram and will retrieve information on sites with the forgotten password
+    function.
+  license: GPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: holehe
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:34.492398+00:00'
+- name: osintgram
+  repo: Datalux/Osintgram
+  stars: 14624
+  description: Osintgram is a OSINT tool on Instagram. It offers an interactive shell
+    to perform analysis on Instagram account of any users by its nickname
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:35.587145+00:00'
+- name: instaloader
+  repo: instaloader/instaloader
+  stars: 13427
+  description: Download pictures (or videos) along with their captions and other metadata
+    from Instagram.
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: instaloader
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:36.400731+00:00'
+- name: photon
+  repo: s0md3v/Photon
+  stars: 13231
+  description: Incredibly fast crawler designed for OSINT.
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: photon
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:37.136957+00:00'
+- name: shadowbroker
+  repo: BigBodyCobain/Shadowbroker
+  stars: 11241
+  description: Open-source intelligence for the global theater. Track everything from
+    the corporate/private jets of the wealthy, and spy satellites, to seismic events
+    in one unified interface. Hook an AI agent up to...
+  license: AGPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:25:38.266801+00:00'
+- name: bbot
+  repo: blacklanternsecurity/bbot
+  stars: 10616
+  description: The recursive internet scanner for hackers. 🧡
+  license: AGPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: bbot
+  default_branch: stable
+  discovered_at: '2026-09-23T20:25:39.545879+00:00'
+- name: oneforall
+  repo: shmilylty/OneForAll
+  stars: 10087
+  description: OneForAll是一款功能强大的子域收集工具
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: oneforall
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:40.241479+00:00'
+- name: trape
+  repo: jofpin/trape
+  stars: 9023
+  description: 'People tracker on the Internet: OSINT analysis and research tool by
+    Jose Pino'
+  license: unknown
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:41.208824+00:00'
+- name: blackbird
+  repo: antoniaci/blackbird
+  stars: 8536
+  description: An OSINT tool to search for accounts by username and email in social
+    networks.
+  license: unknown
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: blackbird
+  default_branch: main
+  discovered_at: '2026-09-23T20:25:41.973632+00:00'
+- name: robin
+  repo: apurvsinghgautam/robin
+  stars: 7314
+  description: AI-Powered Dark Web OSINT Tool
+  license: MIT
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: robin
+  default_branch: main
+  discovered_at: '2026-09-23T20:25:42.739321+00:00'
+- name: instagrapi
+  repo: subzeroid/instagrapi
+  stars: 6834
+  description: 🔥 The fastest and powerful Python library for Instagram Private API
+    2026 with HikerAPI SaaS
+  license: NOASSERTION
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: instagrapi
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:44.452911+00:00'
+- name: dnstwist
+  repo: elceef/dnstwist
+  stars: 5741
+  description: Domain name permutation engine for detecting homograph phishing attacks,
+    typo squatting, and brand impersonation
+  license: Apache-2.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: dnstwist
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:45.193544+00:00'
+- name: h8mail
+  repo: khast3x/h8mail
+  stars: 5309
+  description: Email OSINT & Password breach hunting tool, locally or using premium
+    services. Supports chasing down related email
+  license: NOASSERTION
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: h8mail
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:45.911735+00:00'
+- name: user-scanner
+  repo: kaifcodec/user-scanner
+  stars: 4985
+  description: 🕵️‍♂️ (2-in-1) Email & Username OSINT suite featuring native MCP support
+    for deep data extraction just from a single Email/Username. Analyzes 1080+ actively
+    maintained scan vectors (200+ email / 880+...
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: user-scanner
+  default_branch: main
+  discovered_at: '2026-09-23T20:25:47.019708+00:00'
+- name: torbot
+  repo: DedSecInside/TorBot
+  stars: 4935
+  description: Dark Web OSINT Tool
+  license: NOASSERTION
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: torbot
+  default_branch: dev
+  discovered_at: '2026-09-23T20:25:47.847849+00:00'
+- name: intelowl
+  repo: intelowlproject/IntelOwl
+  stars: 4727
+  description: 'IntelOwl: manage your Threat Intelligence at scale'
+  license: AGPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:48.977160+00:00'
+- name: toutatis
+  repo: megadose/toutatis
+  stars: 4300
+  description: Toutatis is a tool that allows you to extract information from instagrams
+    accounts such as e-mails, phone numbers and more
+  license: GPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: toutatis
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:49.668426+00:00'
+- name: argus
+  repo: divinelabio/Argus
+  stars: 4227
+  description: The Ultimate Information Gathering Toolkit
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: argus
+  default_branch: main
+  discovered_at: '2026-09-23T20:25:50.397701+00:00'
+- name: mr-holmes
+  repo: Lucksi/Mr.Holmes
+  stars: 4220
+  description: 'A Complete Osint Tool :mag:'
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:52.851271+00:00'
+- name: ivre
+  repo: ivre/ivre
+  stars: 4152
+  description: Network recon framework. Build your own, self-hosted and fully-controlled
+    alternatives to Shodan / ZoomEye / Censys and GreyNoise, run your Passive DNS
+    service, build your taylor-made EASM tool, colle...
+  license: GPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: ivre
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:53.832889+00:00'
+- name: aliens-eye
+  repo: arxhr007/Aliens_eye
+  stars: 4122
+  description: Hunt down 840+ social media accounts using AI
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: aliens_eye
+  default_branch: main
+  discovered_at: '2026-09-23T20:25:54.550903+00:00'
+- name: snoop
+  repo: snooppr/snoop
+  stars: 4035
+  description: Snoop — инструмент разведки на основе открытых данных (OSINT world)
+  license: NOASSERTION
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: snoop
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:55.538240+00:00'
+- name: raccoon
+  repo: evyatarmeged/Raccoon
+  stars: 4031
+  description: A high performance offensive security tool for reconnaissance and vulnerability
+    scanning
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: raccoon
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:56.296227+00:00'
+- name: pagodo
+  repo: opsdisk/pagodo
+  stars: 3399
+  description: pagodo (Passive Google Dork) - Automate Google Hacking Database scraping
+    and searching
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:25:58.469266+00:00'
+- name: paramspider
+  repo: devanshbatham/ParamSpider
+  stars: 3174
+  description: Mining URLs from dark corners of Web Archives for bug hunting/fuzzing/further
+    probing
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:00.621272+00:00'
+- name: digital-forensics-guide
+  repo: mikeroyal/Digital-Forensics-Guide
+  stars: 3157
+  description: Digital Forensics Guide. Learn all about Digital Forensics, Computer
+    Forensics, Mobile device Forensics, Network Forensics, and Database Forensics.
+  license: unknown
+  detected_install_method: unknown
+  likely_installable: false
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:02.058630+00:00'
+- name: yesitsme
+  repo: 0x0be/yesitsme
+  stars: 3070
+  description: Simple OSINT script to find Instagram profiles by name and e-mail/phone
+  license: unknown
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:03.215166+00:00'
+- name: tookie-osint
+  repo: Alfredredbird/tookie-osint
+  stars: 2981
+  description: Tookie is a advanced OSINT information gathering tool that finds social
+    media accounts based on inputs.
+  license: MIT
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:05.514649+00:00'
+- name: whatsmyname
+  repo: WebBreacher/WhatsMyName
+  stars: 2885
+  description: Community-maintained dataset of 700+ websites for finding accounts
+    by username — powers OSINT and digital footprint tools.
+  license: NOASSERTION
+  detected_install_method: unknown
+  likely_installable: false
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:06.679720+00:00'
+- name: reconspider
+  repo: bhavsec/reconspider
+  stars: 2811
+  description: 🔎 Most Advanced Open Source Intelligence (OSINT) Framework for scanning
+    IP Address, Emails, Websites, Organizations.
+  license: GPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: reconspider
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:07.356644+00:00'
+- name: email2phonenumber
+  repo: martinvigo/email2phonenumber
+  stars: 2767
+  description: A OSINT tool to obtain a target's phone number just by having his email
+    address
+  license: MIT
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:08.452197+00:00'
+- name: osint-brazuca
+  repo: osintbrazuca/osint-brazuca
+  stars: 2735
+  description: Repositório criado com intuito de reunir informações, fontes(websites/portais)
+    e tricks de OSINT dentro do contexto Brasil.
+  license: MIT
+  detected_install_method: unknown
+  likely_installable: false
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:10.712087+00:00'
+- name: x-osint
+  repo: TermuxHackz/X-osint
+  stars: 2683
+  description: This is an Open source intelligent framework ie an osint tool which
+    gathers valid information about a phone number, user's email address, perform
+    VIN Osint, and reverse, perform subdomain enumeration,...
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:12.744983+00:00'
+- name: pwnedornot
+  repo: thewhiteh4t/pwnedOrNot
+  stars: 2649
+  description: OSINT Tool for Finding Passwords of Compromised Email Addresses
+  license: MIT
+  detected_install_method: unknown
+  likely_installable: false
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:14.607608+00:00'
+- name: nexfil
+  repo: thewhiteh4t/nexfil
+  stars: 2623
+  description: OSINT tool for finding profiles by username
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: nexfil
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:15.324458+00:00'
+- name: redamon
+  repo: samugit83/redamon
+  stars: 2571
+  description: An AI-powered agentic red team framework that automates offensive security
+    operations, from reconnaissance to exploitation to post-exploitation, with zero
+    human intervention.
+  license: MIT
+  detected_install_method: unknown
+  likely_installable: false
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:16.784962+00:00'
+- name: gitgraber
+  repo: hisxo/gitGraber
+  stars: 2433
+  description: 'gitGraber: monitor GitHub to search and find sensitive data in real
+    time for different online services such as: Google, Amazon, Paypal, Github, Mailgun,
+    Facebook, Twitter, Heroku, Stripe...'
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:18.241133+00:00'
+- name: yark
+  repo: Owez/yark
+  stars: 2189
+  description: OSINT for YouTube made simple.
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: yark
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:18.929981+00:00'
+- name: cloud-enum
+  repo: initstring/cloud_enum
+  stars: 2140
+  description: Multi-cloud OSINT tool. Enumerate public resources in AWS, Azure, and
+    Google Cloud.
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:19.974582+00:00'
+- name: gokboru-intel
+  repo: AzizKpln/Gokboru_Intel
+  stars: 2094
+  description: This tool gives information about the phone number that you entered.
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:21.060771+00:00'
+- name: ignorant
+  repo: megadose/ignorant
+  stars: 2075
+  description: ignorant allows you to check if a phone number is used on different
+    sites like snapchat, instagram.
+  license: GPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: ignorant
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:21.968683+00:00'
+- name: searchphone
+  repo: HackUnderway/SearchPhone
+  stars: 1993
+  description: Phone number OSINT toolkit with multi-API search (Google, GitHub, Numverify,
+    Reddit, DuckDuckGo), Hudson Rock infostealer intelligence, and automatic report
+    generation.
+  license: MIT
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:24.180479+00:00'
+- name: tinfoleak
+  repo: vaguileradiaz/tinfoleak
+  stars: 1984
+  description: The most complete open-source tool for Twitter intelligence analysis
+  license: CC-BY-SA-4.0
+  detected_install_method: unknown
+  likely_installable: false
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:25.195102+00:00'
+- name: tidos-framework
+  repo: 0xInfection/TIDoS-Framework
+  stars: 1870
+  description: The Offensive Manual Web Application Penetration Testing Framework.
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:26.474078+00:00'
+- name: linkedin2username
+  repo: initstring/linkedin2username
+  stars: 1856
+  description: 'OSINT Tool: Generate username lists for companies on LinkedIn'
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:27.575848+00:00'
+- name: socialscan
+  repo: iojw/socialscan
+  stars: 1845
+  description: Python library for accurately querying username and email usage on
+    online platforms
+  license: MPL-2.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: socialscan
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:28.640090+00:00'
+- name: fsociety
+  repo: fsociety-team/fsociety
+  stars: 1834
+  description: A Modular Penetration Testing Framework
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: fsociety
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:29.706093+00:00'
+- name: phishing-catcher
+  repo: x0rz/phishing_catcher
+  stars: 1823
+  description: Phishing catcher using Certstream
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:30.790744+00:00'
+- name: blackwidow
+  repo: 1N3/BlackWidow
+  stars: 1823
+  description: A Python based web application scanner to gather OSINT and fuzz for
+    OWASP vulnerabilities on a target website.
+  license: NOASSERTION
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: blackwidow
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:31.732265+00:00'
+- name: onionsearch
+  repo: megadose/OnionSearch
+  stars: 1792
+  description: OnionSearch is a script that scrapes urls on different .onion search
+    engines.
+  license: GPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: onionsearch
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:32.688729+00:00'
+- name: darkdump
+  repo: josh0xA/darkdump
+  stars: 1782
+  description: Open Source Intelligence Interface for Deep Web Scraping
+  license: MIT
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:33.770740+00:00'
+- name: whatbreach
+  repo: Ekultek/WhatBreach
+  stars: 1684
+  description: OSINT tool to find breached emails, databases, pastes, and relevant
+    information
+  license: unknown
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:34.808730+00:00'
+- name: openosint
+  repo: OpenOSINT/OpenOSINT
+  stars: 1630
+  description: AI-powered OSINT agent with interactive REPL, MCP server, and CLI.
+    20 tools. Works with Claude, GPT-4, or local models. For authorized security research
+    only.
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: openosint
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:35.826444+00:00'
+- name: crosslinked
+  repo: m8sec/CrossLinked
+  stars: 1593
+  description: LinkedIn enumeration tool to extract valid employee names from an organization
+    through search engine scraping
+  license: GPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: crosslinked
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:36.781144+00:00'
+- name: clatscope
+  repo: Clats97/ClatScope
+  stars: 1577
+  description: ClatScope Info Tool – The best and most versatile OSINT utility for
+    retrieving geolocation, DNS, WHOIS, phone, email, data breach information and
+    much more (70+ features). Perfect for investigators, p...
+  license: NOASSERTION
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:37.820397+00:00'
+- name: gitgot
+  repo: BishopFox/GitGot
+  stars: 1573
+  description: Semi-automated, feedback-driven tool to rapidly search through troves
+    of public data on GitHub for sensitive secrets.
+  license: LGPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:38.968474+00:00'
+- name: osi-ig
+  repo: th3unkn0n/osi.ig
+  stars: 1570
+  description: Information Gathering Instagram.
+  license: unknown
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:40.141734+00:00'
+- name: whatsapp-osint
+  repo: jasperan/whatsapp-osint
+  stars: 1537
+  description: WhatsApp spy - logs online/offline events from ANYONE in the world
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: whatsapp-osint
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:41.177484+00:00'
+- name: instagram-monitor
+  repo: misiektoja/instagram_monitor
+  stars: 1512
+  description: Track Instagram users' activities, profile changes and capture content
+    with beautiful dashboards and instant notifications
+  license: GPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: instagram_monitor
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:43.181575+00:00'
+- name: geowifi
+  repo: GONZOsint/geowifi
+  stars: 1509
+  description: Search WiFi geolocation data by BSSID and SSID on different public
+    databases.
+  license: unknown
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:45.196932+00:00'
+- name: gasmask
+  repo: twelvesec/gasmask
+  stars: 1477
+  description: Information gathering tool - OSINT
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:46.433446+00:00'
+- name: mailaccess
+  repo: KatrielMoses/MailAccess
+  stars: 1449
+  description: Free email OSINT tool, 2500+ platforms, identity clustering, breach
+    detection. No API keys required. pip install mailaccess
+  license: unknown
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: mailaccess
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:47.390654+00:00'
+- name: buster
+  repo: sham00n/buster
+  stars: 1415
+  description: An advanced tool for email reconnaissance
+  license: GPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: buster
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:48.416597+00:00'
+- name: attacksurfacemapper
+  repo: superhedgy/AttackSurfaceMapper
+  stars: 1410
+  description: AttackSurfaceMapper is a tool that aims to automate the reconnaissance
+    process.
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:49.792687+00:00'
+- name: buildware-tools
+  repo: v4lkyr0/Buildware-Tools
+  stars: 1400
+  description: Buildware-Tools is an all-in-one multitool for security research and
+    automation.
+  license: NOASSERTION
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:51.558739+00:00'
+- name: secator
+  repo: freelabz/secator
+  stars: 1311
+  description: secator - the pentester's swiss knife
+  license: NOASSERTION
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: secator
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:52.834088+00:00'
+- name: favfreak
+  repo: devanshbatham/FavFreak
+  stars: 1308
+  description: Making Favicon.ico based Recon Great again !
+  license: MIT
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:53.890183+00:00'
+- name: harpoon
+  repo: Te-k/harpoon
+  stars: 1293
+  description: CLI tool for open source and threat intelligence
+  license: GPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: harpoon
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:54.835733+00:00'
+- name: xteam
+  repo: xploitstech/Xteam
+  stars: 1292
+  description: Xteam All in one Instagram,Android,phishing osint and wifi hacking
+    tool available
+  license: NOASSERTION
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: xteam
+  default_branch: main
+  discovered_at: '2026-09-23T20:26:55.822993+00:00'
+- name: taranis-ai
+  repo: taranis-ai/taranis-ai
+  stars: 1219
+  description: Taranis AI is an advanced Open-Source Intelligence (OSINT) tool, leveraging
+    Artificial Intelligence to revolutionize information gathering and situational
+    analysis.
+  license: EUPL-1.2
+  detected_install_method: unknown
+  likely_installable: false
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:57.203896+00:00'
+- name: phunter
+  repo: N0rz3/Phunter
+  stars: 1203
+  description: Phunter is an osint tool allowing you to find various information via
+    a phone number 🔎📞
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:58.235143+00:00'
+- name: fav-up
+  repo: pielco11/fav-up
+  stars: 1201
+  description: IP lookup by favicon using Shodan
+  license: MIT
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:26:59.528907+00:00'
+- name: hosthunter
+  repo: SpiderLabs/HostHunter
+  stars: 1172
+  description: HostHunter a recon tool for discovering hostnames using OSINT techniques.
+  license: MIT
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:00.595912+00:00'
+- name: socid-extractor
+  repo: soxoj/socid-extractor
+  stars: 1095
+  description: '⛏️ The extraction engine behind Maigret: turn any profile URL into
+    a structured OSINT record across 150+ sites'
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: socid-extractor
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:01.589085+00:00'
+- name: dnsgen
+  repo: AlephNullSK/dnsgen
+  stars: 1081
+  description: DNSGen is a powerful and flexible DNS name permutation tool designed
+    for security researchers and penetration testers. It generates intelligent domain
+    name variations to assist in subdomain discovery...
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: dnsgen
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:02.629857+00:00'
+- name: zehef
+  repo: N0rz3/Zehef
+  stars: 1076
+  description: Zehef is an osint tool to track emails
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:03.718561+00:00'
+- name: sitedorks
+  repo: Zarcolio/sitedorks
+  stars: 1056
+  description: Search Google/Bing/Ecosia/DuckDuckGo/Yandex/Yahoo for a search term
+    (dork) with a default set of websites, bug bounty programs or custom collection.
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:04.788936+00:00'
+- name: mantis
+  repo: PhonePe/mantis
+  stars: 1038
+  description: Mantis is a security framework that automates the workflow of discovery,
+    reconnaissance, and vulnerability scanning.
+  license: Apache-2.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: mantis
+  default_branch: main
+  discovered_at: '2026-09-23T20:27:05.861005+00:00'
+- name: xeuledoc
+  repo: Malfrats/xeuledoc
+  stars: 1025
+  description: Fetch information about a public Google document.
+  license: GPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: xeuledoc
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:06.925037+00:00'
+- name: dedsec
+  repo: dedsec1121fk/DedSec
+  stars: 1021
+  description: Official repository of the DedSec Project.
+  license: MIT
+  detected_install_method: unknown
+  likely_installable: false
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:27:07.948364+00:00'
+- name: instagramprivsniffer
+  repo: obitouka/InstagramPrivSniffer
+  stars: 1021
+  description: First ever tool to view "Instagram private posts" anonymously
+  license: MIT
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:27:09.090034+00:00'
+- name: gitfive
+  repo: mxrch/GitFive
+  stars: 1018
+  description: 🐙 Track down GitHub users.
+  license: MPL-2.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: gitfive
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:10.019257+00:00'
+- name: linkook
+  repo: JackJuly/linkook
+  stars: 1016
+  description: 🔍 An OSINT tool for discovering linked social accounts and associated
+    emails across multiple platforms using a single username.
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: linkook
+  default_branch: main
+  discovered_at: '2026-09-23T20:27:10.967589+00:00'
+- name: osint-brazuca-regex
+  repo: osintbrazuca/osint-brazuca-regex
+  stars: 1012
+  description: Repositório criado com intuito de reunir expressões regulares dentro
+    do contexto Brasil
+  license: MIT
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:27:12.345246+00:00'
+- name: finalrecon
+  repo: thewhiteh4t/FinalRecon
+  stars: 2997
+  description: All In One Web Recon
+  license: MIT
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:13.371319+00:00'
+- name: rapidscan
+  repo: skavngr/rapidscan
+  stars: 2134
+  description: ':new: The Multi-Tool Web Vulnerability Scanner.'
+  license: GPL-2.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:14.465067+00:00'
+- name: fierce
+  repo: mschwager/fierce
+  stars: 1812
+  description: A DNS reconnaissance tool for locating non-contiguous IP space.
+  license: GPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: fierce
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:15.480091+00:00'
+- name: recon-skills
+  repo: uphiago/recon-skills
+  stars: 1279
+  description: Recon & pentest skill pack. CORS, XSS, SQLi, SSRF, RCE, WordPress,
+    MCP, cloud, subdomain takeover, and more. Field-tested. MIT. Full write-up at
+    hiago.sh
+  license: MIT
+  detected_install_method: unknown
+  likely_installable: false
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:27:16.809342+00:00'
+- name: pywerview
+  repo: the-useless-one/pywerview
+  stars: 1134
+  description: A (partial) Python rewriting of PowerSploit's PowerView
+  license: GPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: pywerview
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:17.759839+00:00'
+- name: airecon
+  repo: pikpikcu/airecon
+  stars: 1064
+  description: AIRecon is an autonomous cybersecurity agent that combines a self-hosted
+    Large Language Model (Ollama) with a Kali Linux Docker sandbox and a Textual TUI.
+    It is designed to automate security assessmen...
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:27:18.831531+00:00'
+- name: sublert
+  repo: yassineaboukir/sublert
+  stars: 1033
+  description: Sublert is a security and reconnaissance tool which leverages certificate
+    transparency to automatically monitor new subdomains deployed by specific organizations
+    and issued TLS/SSL certificate.
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:19.961082+00:00'
+- name: opendoor
+  repo: stanislav-web/OpenDoor
+  stars: 1007
+  description: OWASP Web Recon & Directory Discovery Platform
+  license: GPL-3.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: opendoor
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:20.957538+00:00'
+- name: fsociety
+  repo: Manisso/fsociety
+  stars: 12317
+  description: fsociety Hacking Tools Pack – A Penetration Testing Framework
+  license: MIT
+  detected_install_method: unknown
+  likely_installable: false
+  candidate_pip_package: fsociety
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:21.825040+00:00'
+- name: nettacker
+  repo: OWASP/Nettacker
+  stars: 5616
+  description: Automated Penetration Testing Framework - Open-Source Vulnerability
+    Scanner - Vulnerability Management
+  license: Apache-2.0
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: nettacker
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:22.979633+00:00'
+- name: striker
+  repo: s0md3v/Striker
+  stars: 2344
+  description: Striker is an offensive information and vulnerability scanner.
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: striker
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:23.894776+00:00'
+- name: cloakquest3r
+  repo: spyboy-productions/CloakQuest3r
+  stars: 2267
+  description: Open-source security research tool for identifying origin IP exposure
+    of websites protected by Cloudflare and similar reverse proxy services.
+  license: MIT
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: main
+  discovered_at: '2026-09-23T20:27:24.963392+00:00'
+- name: vulnx
+  repo: anouarbensaad/vulnx
+  stars: 2148
+  description: vulnx 🕷️ an intelligent Bot, Shell can achieve automatic injection,
+    and help researchers detect security vulnerabilities CMS system. It can perform
+    a quick CMS security detection, information collecti...
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: vulnx
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:25.889496+00:00'
+- name: ctfr
+  repo: UnaPibaGeek/ctfr
+  stars: 2123
+  description: Abusing Certificate Transparency logs for getting HTTPS websites subdomains.
+  license: GPL-3.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: ctfr
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:26.871645+00:00'
+- name: recondog
+  repo: s0md3v/ReconDog
+  stars: 2113
+  description: Reconnaissance Swiss Army Knife
+  license: Apache-2.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:27.940686+00:00'
+- name: kithack
+  repo: AdrMXR/KitHack
+  stars: 2091
+  description: Hacking tools pack & backdoors generator.
+  license: MIT
+  detected_install_method: unknown
+  likely_installable: false
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:29.022918+00:00'
+- name: hackerpro
+  repo: jaykali/hackerpro
+  stars: 1865
+  description: All in One Hacking Tool for Linux & Android (Termux). Make your linux
+    environment into a Hacking Machine. Hackers are welcome in our blog
+  license: MIT
+  detected_install_method: unknown
+  likely_installable: false
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:30.178226+00:00'
+- name: anubis
+  repo: jonluca/anubis
+  stars: 1377
+  description: Subdomain enumeration tool
+  license: MIT
+  detected_install_method: pip-repo
+  likely_installable: true
+  candidate_pip_package: anubis
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:31.141133+00:00'
+- name: osif
+  repo: 0xlousie/OSIF
+  stars: 1230
+  description: Open Source Information Facebook
+  license: GPL-2.0
+  detected_install_method: git-requirements
+  likely_installable: true
+  candidate_pip_package: null
+  default_branch: master
+  discovered_at: '2026-09-23T20:27:32.764391+00:00'
