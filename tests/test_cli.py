@@ -891,6 +891,7 @@ def test_doctor_git_missing_debian(monkeypatch, tmp_path):
     monkeypatch.setattr("sys.platform", "linux")
     monkeypatch.setattr("sys.version_info", (3, 12, 0, "final", 0))
     monkeypatch.setattr("shutil.which", lambda x: None)
+    monkeypatch.setattr("otinstaller.config.get_distro", lambda: "debian")
     monkeypatch.setattr("otinstaller.config.get_distro_family", lambda: "debian")
 
     def mock_run(*args, **kwargs):
@@ -941,6 +942,7 @@ def test_doctor_venv_broken_debian(monkeypatch, tmp_path):
     monkeypatch.setattr("sys.platform", "linux")
     monkeypatch.setattr("sys.version_info", (3, 12, 0, "final", 0))
     monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git" if x == "git" else None)
+    monkeypatch.setattr("otinstaller.config.get_distro", lambda: "debian")
     monkeypatch.setattr("otinstaller.config.get_distro_family", lambda: "debian")
 
     def mock_run(*args, **kwargs):
@@ -995,6 +997,7 @@ def test_doctor_home_not_writable(monkeypatch, tmp_path):
     monkeypatch.setattr("sys.platform", "linux")
     monkeypatch.setattr("sys.version_info", (3, 12, 0, "final", 0))
     monkeypatch.setattr("shutil.which", lambda x: "/usr/bin/git" if x == "git" else None)
+    monkeypatch.setattr("otinstaller.config.get_distro", lambda: "debian")
     monkeypatch.setattr("otinstaller.config.get_distro_family", lambda: "debian")
 
     def mock_run(*args, **kwargs):
