@@ -1,9 +1,6 @@
 """Notice tests."""
 
 import json
-import sys
-
-import pytest
 
 from otinstaller.config import get_accept_path
 from otinstaller.notice import has_accepted, record_acceptance
@@ -34,7 +31,6 @@ def test_corrupt_file_not_accepted(monkeypatch, tmp_path):
     assert has_accepted() is False
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="file permissions work differently on Windows")
 def test_accept_file_mode_600(monkeypatch, tmp_path):
     monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
     record_acceptance()

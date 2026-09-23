@@ -1,13 +1,8 @@
 """Venv tests."""
 
-import sys
-
-import pytest
-
 from otinstaller.installer.venv import create_venv, venv_bin, venv_python
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="venv creation on Windows uses different paths")
 def test_create_venv(monkeypatch, tmp_path):
     log = tmp_path / "test.log"
     venv_path = tmp_path / "venv"

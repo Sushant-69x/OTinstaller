@@ -20,6 +20,7 @@ from otinstaller.config import (
     get_env_file,
     get_home,
     get_logs_dir,
+    get_results_dir,
     get_tools_dir,
 )
 from otinstaller.installer import (
@@ -42,6 +43,8 @@ from otinstaller.registry import (
     search_tools,
     suggest_names,
 )
+from otinstaller.results import write_meta
+from otinstaller.runner import run_tool
 from otinstaller.state import list_installed
 
 app = typer.Typer(
@@ -453,12 +456,101 @@ def remove(
 def run(
     tool: Annotated[str, typer.Argument(help="Tool name to run")],
     extra_args: Annotated[list[str] | None, typer.Argument()] = None,
+    case: Annotated[
+        str | None, typer.Option("--case", help="Group runs under a named case")
+    ] = None,
+    target: Annotated[
+        str | None, typer.Option("--target", help="Target for the run (default: first extra arg)")
+    ] = None,
+    verbose: Annotated[
+        bool, typer.Option("--verbose", help="Stream tool output to terminal")
+    ] = False,
+    no_color: Annotated[bool, typer.Option("--no-color", help="Disable colored output")] = False,
 ):
     """Run a tool with arguments passed through after --."""
     if extra_args is None:
         extra_args = []
-    typer.echo("not implemented yet")
-    raise typer.Exit(code=2)
+
+    if sys.platform != "linux":
+        typer.echo("error: otinstaller currently supports Linux only", err=True)
+        raise typer.Exit(code=1)
+
+    tools_registry = _load_registry(False)
+    t = find_tool(tools_registry, tool)
+    if not t:
+        suggestions = suggest_names(tools_registry, tool)
+        msg = f"error: unknown tool '{tool}'"
+        if suggestions:
+            msg += f"\ndid you mean: {', '.join(suggestions)}?"
+        typer.echo(msg, err=True)
+        raise typer.Exit(code=1)
+
+    # Check if tool is installed
+    from otinstaller.state import get_installed
+
+    installed = get_installed(tool)
+    if not installed:
+        typer.echo(
+            f"error: {tool} is not installed, run 'otinstaller install {tool}' first",
+            err=True,
+        )
+        raise typer.Exit(code=1)
+
+    root = get_tools_dir() / tool
+
+    # Determine target
+    run_target = target if target is not None else (extra_args[0] if extra_args else "unspecified")
+
+    # Run with status spinner unless --no-color or not a terminal
+    console = _make_console(no_color)
+    use_spinner = not no_color and sys.stdout.isatty()
+
+    try:
+        if use_spinner:
+            with console.status(f"running {tool}..."):
+                meta = run_tool(
+                    t,
+                    root,
+                    extra_args,
+                    target=run_target,
+                    case=case,
+                    env_overrides=None,
+                    stream=verbose,
+                )
+        else:
+            typer.echo(f"running {tool}...")
+            meta = run_tool(
+                t,
+                root,
+                extra_args,
+                target=run_target,
+                case=case,
+                env_overrides=None,
+                stream=verbose,
+            )
+
+        # Fill in tool_version from installed state and rewrite meta
+        meta.tool_version = installed.version
+        results_dir = get_results_dir()
+        meta_path = results_dir / Path(meta.output_path).with_suffix(".meta.json")
+        write_meta(meta, meta_path)
+
+        typer.echo(f"tool exited {meta.exit_code}")
+        typer.echo(f"saved to {meta.output_path}")
+        typer.echo(f"sha256  {meta.sha256}")
+
+        # Exit with tool's exit code
+        if meta.exit_code != 0:
+            raise typer.Exit(code=meta.exit_code)
+
+    except KeyboardInterrupt:
+        msg = "interrupted, partial output saved to "
+        if "meta" in locals() and hasattr(meta, "output_path"):
+            msg += meta.output_path
+        else:
+            msg += "unknown"
+        typer.echo(msg, err=True)
+        raise typer.Exit(code=130) from None
 
 
 @app.command()
@@ -583,8 +675,7 @@ def doctor(
         typer.echo(f"[ok] python {major}.{minor} is supported")
     else:
         typer.echo(
-            f"[problem] python {major}.{minor} is not supported, "
-            f"this project targets 3.10-3.12"
+            f"[problem] python {major}.{minor} is not supported, this project targets 3.10-3.12"
         )
         problems += 1
 

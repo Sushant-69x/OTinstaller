@@ -1,7 +1,5 @@
 """Safe rmtree tests."""
 
-import sys
-
 import pytest
 
 from otinstaller.config import get_tools_dir
@@ -43,7 +41,6 @@ def test_safe_rmtree_refuses_dotdot_paths(monkeypatch, tmp_path):
         safe_rmtree(bad_path)
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="symlinks require admin on Windows")
 def test_safe_rmtree_unlinks_symlink(monkeypatch, tmp_path):
     monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
     target = get_tools_dir() / "testtool"

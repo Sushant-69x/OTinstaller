@@ -1,6 +1,7 @@
 """CLI tests."""
 
 import sys
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -65,10 +66,32 @@ def test_stub_commands_exit_2(cmd_args):
     assert "not implemented yet" in result.output
 
 
-def test_run_with_extra_args():
+def test_run_with_extra_args(monkeypatch, tmp_path):
+    monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))
+    monkeypatch.setenv(
+        "OTINSTALLER_REGISTRY",
+        str(
+            make_registry_yaml(
+                tmp_path,
+                [
+                    {
+                        "name": "sherlock",
+                        "display_name": "Sherlock",
+                        "description": "Search usernames",
+                        "install": {"method": "pip", "package": "sherlock-project"},
+                        "entrypoint": {"command": "sherlock"},
+                        "capabilities": ["username-search"],
+                    }
+                ],
+            )
+        ),
+    )
+    # Run init first
+    runner.invoke(app, ["init", "--yes"])
+
     result = runner.invoke(app, ["run", "sherlock", "--", "someuser", "--timeout", "5"])
-    assert result.exit_code == 2
-    assert "not implemented yet" in result.output
+    assert result.exit_code == 1
+    assert "not installed" in result.output
 
 
 def make_registry_yaml(tmp_path, tools_data):
@@ -817,6 +840,7 @@ def test_doctor_all_ok(monkeypatch, tmp_path):
     def mock_run(*args, **kwargs):
         class Result:
             returncode = 0
+
         return Result()
 
     monkeypatch.setattr("subprocess.run", mock_run)
@@ -849,6 +873,7 @@ def test_doctor_python_version_problem(monkeypatch, tmp_path):
     def mock_run(*args, **kwargs):
         class Result:
             returncode = 0
+
         return Result()
 
     monkeypatch.setattr("subprocess.run", mock_run)
@@ -870,6 +895,7 @@ def test_doctor_git_missing_debian(monkeypatch, tmp_path):
     def mock_run(*args, **kwargs):
         class Result:
             returncode = 0
+
         return Result()
 
     monkeypatch.setattr("subprocess.run", mock_run)
@@ -890,11 +916,14 @@ def test_doctor_git_missing_arch(monkeypatch, tmp_path):
     # Mock distro detection
     os_release = tmp_path / "os-release"
     os_release.write_text('ID="arch"\n')
-    monkeypatch.setattr("otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x))
+    monkeypatch.setattr(
+        "otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x)
+    )
 
     def mock_run(*args, **kwargs):
         class Result:
             returncode = 0
+
         return Result()
 
     monkeypatch.setattr("subprocess.run", mock_run)
@@ -916,6 +945,7 @@ def test_doctor_venv_broken_debian(monkeypatch, tmp_path):
     def mock_run(*args, **kwargs):
         class Result:
             returncode = 1
+
         return Result()
 
     monkeypatch.setattr("subprocess.run", mock_run)
@@ -936,11 +966,14 @@ def test_doctor_venv_broken_arch(monkeypatch, tmp_path):
     # Mock distro detection
     os_release = tmp_path / "os-release"
     os_release.write_text('ID="arch"\n')
-    monkeypatch.setattr("otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x))
+    monkeypatch.setattr(
+        "otinstaller.config.Path", lambda x: os_release if x == "/etc/os-release" else Path(x)
+    )
 
     def mock_run(*args, **kwargs):
         class Result:
             returncode = 1
+
         return Result()
 
     monkeypatch.setattr("subprocess.run", mock_run)
@@ -962,6 +995,7 @@ def test_doctor_home_not_writable(monkeypatch, tmp_path):
     def mock_run(*args, **kwargs):
         class Result:
             returncode = 0
+
         return Result()
 
     monkeypatch.setattr("subprocess.run", mock_run)
