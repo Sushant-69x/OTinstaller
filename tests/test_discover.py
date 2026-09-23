@@ -1,6 +1,7 @@
 """Tests for the discovery pipeline."""
 
 import time
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import requests
@@ -9,6 +10,7 @@ import yaml
 from otinstaller.denylist import Denylist, check_tool
 from otinstaller.registry import Tool
 from pipeline.discover import (
+    _load_env_tokens_file,
     check_pypi,
     detect_install_method,
     sanitize_name,
@@ -212,3 +214,57 @@ def test_network_error_continues():
     # This is more of an integration test - we'll test the logic
     # in the main function by mocking fetch_repo_details to fail for one repo
     pass
+
+
+def test_load_env_tokens_file(tmp_path, monkeypatch):
+    """Test that KEY=VALUE lines from ~/.env_tokens are loaded into os.environ."""
+    # Point Path.home() to tmp_path
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+
+    # Create a temp .env_tokens file
+    env_tokens = tmp_path / ".env_tokens"
+    env_tokens.write_text("""
+# This is a comment
+GITHUB_TOKEN=ghp_test123
+API_KEY=abc456
+EMPTY_VALUE=
+INVALID_LINE
+KEY_WITH_SPACES = value with spaces
+""")
+
+    # Ensure the keys are not already in os.environ
+    import os
+
+    for key in ["GITHUB_TOKEN", "API_KEY", "EMPTY_VALUE", "KEY_WITH_SPACES"]:
+        if key in os.environ:
+            del os.environ[key]
+
+    # Call the function
+    _load_env_tokens_file()
+
+    # Verify the values were loaded
+    assert os.environ.get("GITHUB_TOKEN") == "ghp_test123"
+    assert os.environ.get("API_KEY") == "abc456"
+    assert os.environ.get("EMPTY_VALUE") == ""
+    assert os.environ.get("KEY_WITH_SPACES") == "value with spaces"
+
+    # Verify that existing env vars are not overwritten
+    os.environ["GITHUB_TOKEN"] = "existing_value"
+    _load_env_tokens_file()
+    assert os.environ.get("GITHUB_TOKEN") == "existing_value"
+
+    # Clean up
+    for key in ["GITHUB_TOKEN", "API_KEY", "EMPTY_VALUE", "KEY_WITH_SPACES"]:
+        if key in os.environ:
+            del os.environ[key]
+
+
+def test_load_env_tokens_file_missing(monkeypatch):
+    """Test that missing ~/.env_tokens is handled gracefully."""
+    import tempfile
+    from pathlib import Path
+
+    # Point Path.home() to a non-existent directory
+    with tempfile.TemporaryDirectory() as tmpdir:
+        monkeypatch.setattr(Path, "home", lambda: Path(tmpdir) / "nonexistent")
+        _load_env_tokens_file()  # Should not raise

@@ -16,6 +16,30 @@ import yaml
 from otinstaller.denylist import Denylist, check_tool, load_denylist
 from otinstaller.registry import Tool
 
+
+def _load_env_tokens_file() -> None:
+    """Load KEY=VALUE pairs from ~/.env_tokens into os.environ if not already set."""
+    env_tokens_path = Path.home() / ".env_tokens"
+    if not env_tokens_path.is_file():
+        return
+    try:
+        for line in env_tokens_path.read_text().splitlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip()
+            if key and key not in os.environ:
+                os.environ[key] = value
+    except OSError:
+        pass
+
+
+_load_env_tokens_file()
+
 GITHUB_API = "https://api.github.com"
 PYPI_API = "https://pypi.org/pypi"
 
