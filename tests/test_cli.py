@@ -1,5 +1,6 @@
 """CLI tests."""
 
+import os
 import sys
 from pathlib import Path
 from unittest.mock import patch
@@ -984,6 +985,10 @@ def test_doctor_venv_broken_arch(monkeypatch, tmp_path):
     assert "should be included with python on Arch" in result.output
 
 
+@pytest.mark.skipif(
+    hasattr(os, "geteuid") and os.geteuid() == 0,
+    reason="permission checks are meaningless as root",
+)
 def test_doctor_home_not_writable(monkeypatch, tmp_path):
     """doctor fails when home is not writable."""
     monkeypatch.setenv("OTINSTALLER_HOME", str(tmp_path))

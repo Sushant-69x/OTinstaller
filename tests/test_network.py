@@ -1,8 +1,10 @@
 """Network tests (require RUN_NETWORK_TESTS=1)."""
 
 import os
+import shutil
 import signal
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -67,9 +69,12 @@ def test_network_sigint_cleanup():
 
         # Start install in background using subprocess in its own process group
         # so we can send SIGINT to it without affecting the test process
+        otinstaller_path = shutil.which("otinstaller") or [sys.executable, "-m", "otinstaller"]
+        if isinstance(otinstaller_path, str):
+            otinstaller_path = [otinstaller_path]
         proc = subprocess.Popen(
             [
-                "otinstaller",
+                *otinstaller_path,
                 "install",
                 "maigret",
                 "--yes",
