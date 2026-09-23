@@ -1,0 +1,18 @@
+- name: sherlock
+  repo: sherlock-project/sherlock
+  stars: 92529
+  description: Hunt down social media accounts by username across social networks
+  license: MIT
+  detected_install_method: pip-repo
+  candidate_pip_package: sherlock
+  default_branch: master
+  discovered_at: '2026-09-23T14:38:24.460161+00:00'
+- name: maigret
+  repo: soxoj/maigret
+  stars: 37914
+  description: 🕵️‍♂️ Collect a dossier on a person by username from 6K websites
+  license: MIT
+  detected_install_method: pip-repo
+  candidate_pip_package: maigret
+  default_branch: main
+  discovered_at: '2026-09-23T14:38:25.396429+00:00'
