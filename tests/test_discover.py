@@ -10,9 +10,12 @@ import yaml
 from otinstaller.denylist import Denylist, check_tool
 from otinstaller.registry import Tool
 from pipeline.discover import (
+    TOPIC_QUERIES,
     _load_env_tokens_file,
     check_pypi,
+    collect_repos,
     detect_install_method,
+    likely_installable,
     sanitize_name,
     truncate_description,
 )
@@ -268,3 +271,53 @@ def test_load_env_tokens_file_missing(monkeypatch):
     with tempfile.TemporaryDirectory() as tmpdir:
         monkeypatch.setattr(Path, "home", lambda: Path(tmpdir) / "nonexistent")
         _load_env_tokens_file()  # Should not raise
+
+
+def test_collect_repos_spans_multiple_queries(monkeypatch):
+    """Test that multiple topic queries are attempted when limit requires them."""
+    calls = []
+
+    def fake_search_repos(session, query, limit=None):
+        calls.append(query)
+        n = len(calls)
+        # Each query returns 2 unique repos
+        items = [{"full_name": f"org{n}/repo{i}"} for i in range(2)]
+        return items if limit is None else items[:limit]
+
+    monkeypatch.setattr("pipeline.discover.search_repos", fake_search_repos)
+
+    # Limit 5 requires 3 queries (2+2+2 = 6, stop at 5)
+    repos = collect_repos(None, limit=5)
+    assert calls == TOPIC_QUERIES[:3]
+    assert len(repos) == 5
+    full_names = [r["full_name"] for r in repos]
+    assert len(full_names) == len(set(full_names))
+
+
+def test_collect_repos_no_limit_runs_all_queries(monkeypatch):
+    """Test that without limit, all 5 topic queries run."""
+    calls = []
+
+    def fake_search_repos(session, query, limit=None):
+        calls.append(query)
+        return []
+
+    monkeypatch.setattr("pipeline.discover.search_repos", fake_search_repos)
+
+    repos = collect_repos(None, limit=None)
+    assert calls == list(TOPIC_QUERIES)
+    assert repos == []
+
+
+def test_likely_installable():
+    """Test the likely_installable function."""
+    # Known install methods are True
+    assert likely_installable("pip-repo", ["pyproject.toml"]) is True
+    assert likely_installable("git-requirements", ["requirements.txt"]) is True
+
+    # Unknown with no markers is False
+    assert likely_installable("unknown", []) is False
+    assert likely_installable("unknown", ["README.md"]) is False
+
+    # Unknown with a marker present (spec literal) is True
+    assert likely_installable("unknown", ["requirements.txt"]) is True

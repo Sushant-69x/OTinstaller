@@ -128,6 +128,36 @@ def search_repos(session: requests.Session, query: str, limit: int | None = None
     return repos[:limit] if limit else repos
 
 
+def collect_repos(session: requests.Session, limit: int | None = None) -> list[dict]:
+    """Collect unique repos across all topic queries, up to limit total."""
+    collected: list[dict] = []
+    seen: set[str] = set()
+
+    for query in TOPIC_QUERIES:
+        remaining = None if limit is None else limit - len(collected)
+        if remaining is not None and remaining <= 0:
+            break
+
+        print(f"Searching: {query}")
+        repos = search_repos(session, query, limit=remaining)
+
+        for repo in repos:
+            full_name = repo["full_name"]
+            if full_name not in seen:
+                seen.add(full_name)
+                collected.append(repo)
+
+    return collected
+
+
+def likely_installable(install_method: str, root_files: list[str]) -> bool:
+    """Return True if repo is likely installable via pip or git."""
+    if install_method != "unknown":
+        return True
+    markers = ("requirements.txt", "setup.py", "pyproject.toml")
+    return any(f in root_files for f in markers)
+
+
 def fetch_repo_details(session: requests.Session, full_name: str) -> dict | None:
     try:
         print(f"  Fetching details for {full_name}...")
@@ -214,20 +244,7 @@ def main():
     denylist_path = Path("registry/denylist.yaml")
     denylist = load_denylist(denylist_path) if denylist_path.exists() else Denylist()
 
-    all_repos = []
-    seen = set()
-
-    for query in TOPIC_QUERIES:
-        print(f"Searching: {query}")
-        repos = search_repos(session, query, limit=args.limit)
-        for repo in repos:
-            full_name = repo["full_name"]
-            if full_name not in seen:
-                seen.add(full_name)
-                all_repos.append(repo)
-        if args.limit and len(all_repos) >= args.limit:
-            all_repos = all_repos[: args.limit]
-            break
+    all_repos = collect_repos(session, limit=args.limit)
 
     print(f"Found {len(all_repos)} unique repos before filtering")
 
@@ -238,6 +255,7 @@ def main():
         "denylist": 0,
         "errors": 0,
         "candidates": 0,
+        "likely_installable": 0,
         "install_methods": {"pip-repo": 0, "git-requirements": 0, "unknown": 0},
     }
 
@@ -290,6 +308,7 @@ def main():
             default_branch = details.get("default_branch", "main")
             root_files = fetch_repo_root_files(session, full_name, default_branch)
             install_method = detect_install_method(root_files)
+            is_likely = likely_installable(install_method, root_files)
 
             # Check PyPI
             candidate_pip = check_pypi(session, name.lower())
@@ -306,6 +325,7 @@ def main():
                     else "unknown"
                 ),
                 "detected_install_method": install_method,
+                "likely_installable": is_likely,
                 "candidate_pip_package": candidate_pip,
                 "default_branch": default_branch,
                 "discovered_at": datetime.now(timezone.utc).isoformat(),
@@ -313,6 +333,8 @@ def main():
 
             candidates.append(candidate)
             stats["candidates"] += 1
+            if is_likely:
+                stats["likely_installable"] += 1
             stats["install_methods"][install_method] = (
                 stats["install_methods"].get(install_method, 0) + 1
             )
@@ -340,6 +362,9 @@ def main():
     print("Install method breakdown:")
     for method, count in stats["install_methods"].items():
         print(f"  {method}: {count}")
+    likely_true = stats["likely_installable"]
+    likely_false = stats["candidates"] - likely_true
+    print(f"Likely installable: {likely_true} true, {likely_false} false")
 
 
 if __name__ == "__main__":
